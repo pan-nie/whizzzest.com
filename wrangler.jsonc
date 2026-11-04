@@ -2,6 +2,8 @@
   // 焰境·万载 — Workers Static Assets（方案 §4 / §9）
   // 注意：whizzzest.com zone 归属 nathanpenny@qq.com 账号，部署前 wrangler 需登录该账号。
   "name": "whizzzest",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-01",
   // 可观测日志（对齐 admin/writer/merchant 三个子站；docs/全站优化方案.md W4）
   "observability": { "enabled": true },

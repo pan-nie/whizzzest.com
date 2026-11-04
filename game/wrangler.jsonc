@@ -5,6 +5,8 @@
   // 安全：请求统一补 X-Content-Type-Options / Referrer-Policy
   // 后续（阶段三）：D1 + 会话（云存档）——按方案 §6 追加
   "name": "whizzzest-game",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-01",
   "main": "worker/index.js",
   "observability": { "enabled": true },

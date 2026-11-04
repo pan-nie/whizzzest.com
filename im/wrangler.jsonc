@@ -6,6 +6,8 @@
   //       邮件复用 SMTP_USER / SMTP_PASS（验证码经 notifications@whizzzest.com 发送）
   // 实时：DO IMRoom（每会话一实例，WebSocket Hibernation）+ DO RateLimiter（每 IP，模式照 workers-chat-demo）
   "name": "whizzzest-im",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-01",
   "main": "index.js",
   "observability": { "enabled": true },

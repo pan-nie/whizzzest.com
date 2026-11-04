@@ -4,6 +4,8 @@
   // 安全：整域 noindex；PBKDF2 密码哈希；登录/申请 IP 限流；独立会话密钥
   // 凭据：wrangler secret 配 MERCHANT_SESSION_SECRET（本地明文在 .dev.vars）
   "name": "whizzzest-merchant",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-01",
   "main": "index.js",
   "observability": { "enabled": true },

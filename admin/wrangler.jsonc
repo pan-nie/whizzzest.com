@@ -3,6 +3,8 @@
   // 与公开站（根目录 whizzzest）分离部署：后台挂了不影响主站。
   // 线上凭据用 wrangler secret 配置：ADMIN_PASSWORD / ADMIN_SESSION_SECRET
   "name": "whizzzest-admin",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-01",
   "main": "index.js",
   "observability": { "enabled": true },
