@@ -11,6 +11,7 @@
  * 页面只出列表与数据（data-* 属性），播放器交互逻辑在 music-player.js（2026-09-10 结构精简 A3 自 main.js 拆出，单 <audio> 复用 + MediaSession）。
  */
 import { UI, LOCALES } from './strings.js';
+import { jsonForHtml } from '../shared/json-for-html.cjs';
 
 const SITE_URL = 'https://whizzzest.com';
 
@@ -195,10 +196,10 @@ function pageShell(chrome, loc, { title, description, url, body, jsonLd }) {
   const mpV = chrome.meta['/assets/js/music-player.js'] || '';
   const ogImage = '/assets/img/longhu_yanhuowanhui.jpeg';
   const ld = jsonLd
-    ? `  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>\n`
+    ? `  <script type="application/ld+json">${jsonForHtml(jsonLd)}</script>\n`
     : '';
   // main.js 的 UI 文案表：构建产物 build-meta.json 携带 per-locale js 串（与静态页 head 注入同源）
-  const i18nJs = `  <script>window.__I18N=${JSON.stringify(chrome.meta.i18n?.[loc] || {})}</script>\n`;
+  const i18nJs = `  <script>window.__I18N=${jsonForHtml(chrome.meta.i18n?.[loc] || {})}</script>\n`;
   return `<!DOCTYPE html>
 <html lang="${L.htmlLang}">
 <head>
