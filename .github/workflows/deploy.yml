@@ -13,8 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # 构建自检 + 4 个 Worker 的部署 dry-run（不需要任何 token/secret）。
-  # push main 时与 deploy 并行执行，仅报告不拦截 —— 失败不阻塞正常上线。
+  # 构建与安全回归检查通过后才允许部署（不需要生产 token/secret）。
   check:
     name: Build + deploy dry-run
     runs-on: ubuntu-latest
@@ -31,6 +30,9 @@ jobs:
 
       - name: Build
         run: node build.js
+
+      - name: Security regression tests
+        run: npm run test:security
 
       - name: Dry-run main site
         run: npx -y wrangler@4.129.0 deploy --dry-run --outdir=.wrangler-dry
@@ -51,8 +53,16 @@ jobs:
         working-directory: im
         run: npx -y wrangler@4.129.0 deploy --dry-run --outdir=.wrangler-dry
 
+      - name: Dry-run game portal
+        working-directory: game
+        run: npx -y wrangler@4.129.0 deploy --dry-run --outdir=.wrangler-dry
+
+      - name: Worker transport integration tests
+        run: npm run test:workers
+
   deploy:
     name: Deploy
+    needs: check
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:

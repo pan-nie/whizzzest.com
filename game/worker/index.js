@@ -17,6 +17,8 @@
  *   - 其余         → 交还资产层（无匹配时按 not_found_handling 返回 /404.html）
  * 阶段二绑定：R2（第三方游戏包，后续模拟器内核/ROM 同桶）；D1（云存档）仍按方案 §6 后置。
  */
+import { requireHttps } from '../../shared/https.mjs';
+
 const PLAY_RE = /^\/play\/(?:[\w.-]+)?\/?$/; // 允许 id 含点（minecraft-1.8）；仍不含斜杠，防路径穿越
 const PLAY_RE_EN = /^\/en\/play\/(?:[\w.-]+)?\/?$/; // 英文运行页同规则（前端 boot 的 id 提取正则允许 /en 前缀）
 
@@ -104,6 +106,8 @@ async function handleGameApi(request, url) {
 
 export default {
   async fetch(request, env) {
+    const insecure = requireHttps(request);
+    if (insecure) return insecure;
     const url = new URL(request.url);
     if (url.pathname.startsWith('/g/api/')) {
       return handleGameApi(request, url);

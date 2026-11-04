@@ -7,6 +7,8 @@
   // 账号：writer_users 与商户 merchant_users 完全独立，同手机号可在两边各注册
   // 媒体：封面/章节插图存 R2 桶 whizzzest-media（book/ 前缀），公开读取走主站 /media/ 代理
   "name": "whizzzest-writer",
+  "workers_dev": false,
+  "preview_urls": false,
   "compatibility_date": "2026-09-01",
   "main": "index.js",
   "observability": { "enabled": true },

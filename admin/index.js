@@ -55,6 +55,7 @@
 
 import { PASSKEY_DASH_JS, WA_HELPERS } from '../shared/portal-ui.js';
 import { createWebAuthn } from '../shared/webauthn.js';
+import { requireHttps } from '../shared/https.mjs';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 天
 const SESSION_TTL_S = SESSION_TTL_MS / 1000;
@@ -109,6 +110,8 @@ const FAVICON_LINK = `<link rel="icon" type="image/svg+xml" href="${FAVICON_URI}
 
 export default {
   async fetch(request, env) {
+    const insecure = requireHttps(request);
+    if (insecure) return insecure;
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 

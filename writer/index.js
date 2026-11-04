@@ -30,6 +30,7 @@
  * 邮件：验证码经 notifications@whizzzest.com（worker/smtp.js），需 secret SMTP_USER / SMTP_PASS。
  */
 import { sendMail } from '../worker/smtp.js';
+import { requireHttps } from '../shared/https.mjs';
 import { authPage, loginPanel, passkeyRowHtml, PASSKEY_DASH_JS, ICO } from '../shared/portal-ui.js';
 import { createWebAuthn } from '../shared/webauthn.js';
 import { normalizePhone, phoneCountryOptionsHtml, maskPhone } from '../shared/phone.js';
@@ -96,6 +97,8 @@ const wa = createWebAuthn({
 
 export default {
   async fetch(request, env) {
+    const insecure = requireHttps(request);
+    if (insecure) return insecure;
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 

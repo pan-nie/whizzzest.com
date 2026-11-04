@@ -32,11 +32,14 @@ import { handleWs } from './src/ws.js';
 import { loginPanelHtml, registerPanelHtml, LOGIN_PAGE_JS, REGISTER_PAGE_JS, appShellHtml } from './src/pages/auth.js';
 import { PORTAL_UI } from './src/config.js';
 import { authPage } from '../shared/portal-ui.js';
+import { requireHttps } from '../shared/https.mjs';
 
 /* ---------------- 入口：安全头统一包裹 ---------------- */
 
 export default {
   async fetch(request, env) {
+    const insecure = requireHttps(request);
+    if (insecure) return insecure;
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 

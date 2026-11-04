@@ -18,6 +18,7 @@ import { handleLibrary } from './library.js';
 import { handleMusic, handleMusicPlay, handleMusicLatest } from './music.js';
 import { handleAttractions, handleAttractionsLatest } from './attractions.js';
 import { handleAiChat, handleAiConfig } from './ai.js';
+import { requireHttps } from '../shared/https.mjs';
 
 const BOT_RE = /bot|crawl|spider|slurp|preview|headless|monitor/i;
 const VID_COOKIE = 'vid';
@@ -27,6 +28,8 @@ const SID_MAX_AGE = 30 * 60; // 30 分钟滑动会话
 
 export default {
   async fetch(request, env, ctx) {
+    const insecure = requireHttps(request);
+    if (insecure) return insecure;
     const url = new URL(request.url);
 
     if (url.hostname === 'www.whizzzest.com') {

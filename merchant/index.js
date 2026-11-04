@@ -24,6 +24,7 @@
  *       公开读取走主站 https://whizzzest.com/assets-merchant/<key>（主 Worker 代理）。
  */
 import { sendMail } from '../worker/smtp.js';
+import { requireHttps } from '../shared/https.mjs';
 import { authPage, loginPanel, widePage, passkeyRowHtml, PASSKEY_DASH_JS } from '../shared/portal-ui.js';
 import { createWebAuthn } from '../shared/webauthn.js';
 import { normalizePhone, phoneCountryOptionsHtml, maskPhone } from '../shared/phone.js';
@@ -99,6 +100,8 @@ const wa = createWebAuthn({
 
 export default {
   async fetch(request, env) {
+    const insecure = requireHttps(request);
+    if (insecure) return insecure;
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
