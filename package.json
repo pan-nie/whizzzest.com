@@ -6,7 +6,7 @@
   "description": "焰境·万载 — 零依赖静态构建 + Cloudflare Workers；sharp 仅用于构建期 WebP 图片优化；@simplewebauthn/server 用于门户通行密钥、libphonenumber-js 用于手机号编号计划级核验（均打包进 writer/merchant Worker，docs/手机号国际化方案.md）",
   "scripts": {
     "build": "node build.js",
-    "test:security": "node --test scripts/test-security.mjs scripts/test-content-security.cjs",
+    "test:security": "node --test scripts/test-security.mjs scripts/test-content-security.cjs scripts/test-admin-revocation.cjs",
     "test:workers": "node scripts/test-worker-transport.cjs"
   },
   "devDependencies": {

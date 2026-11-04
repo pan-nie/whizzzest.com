@@ -65,6 +65,7 @@ const COOKIE_NAME = 'wa_session';
  * portal='admin'：站长（uid=0，密码在 secret ADMIN_PASSWORD，无 D1 行）与运营账号（admin_users.id）
  * 共用 webauthn_credentials 表，凭据与其他子域互不可用。challenge 签名复用 ADMIN_SESSION_SECRET。 */
 function waUser(env, uid) {
+  if (!Number.isSafeInteger(uid) || uid < 0) return Promise.resolve(null);
   if (uid === 0) return Promise.resolve({ uid: 0 });
   return env.DB.prepare('SELECT id, username FROM admin_users WHERE id = ?1').bind(uid)
     .first().then((row) => (row ? { uid: row.id, username: row.username } : null));
@@ -415,6 +416,9 @@ async function handleLogin(request, env) {
 
 /** 会话签发（密码登录与 Passkey 登录共用）：200 JSON + 签名会话 Cookie */
 async function sessionJson(env, uid) {
+  // Password and Passkey login must both resolve to a current administrator.
+  // This also rejects credentials left behind by an earlier account deletion.
+  if (!(await waUser(env, uid))) return json({ ok: false, error: 'unauthorized' }, 401);
   const exp = String(Date.now() + SESSION_TTL_MS);
   const sig = await hmacHex(env.ADMIN_SESSION_SECRET, uid + '.' + exp);
   const res = json({ ok: true });
@@ -436,7 +440,8 @@ async function sessionUid(request, env) {
   if (!Number.isFinite(expNum) || expNum < Date.now()) return null;
   const expected = await hmacHex(env.ADMIN_SESSION_SECRET, uid + '.' + exp);
   if (!timingSafeEqual(sig, expected)) return null;
-  return Number(uid);
+  const id = Number(uid);
+  return (await waUser(env, id)) ? id : null;
 }
 
 /** uid → 展示名 */
@@ -481,7 +486,12 @@ async function createAccount(env, request) {
 }
 
 async function removeAccount(env, id) {
-  const { meta } = await env.DB.prepare('DELETE FROM admin_users WHERE id = ?1').bind(id).run();
+  // The primary owner has no admin_users row; never remove its Passkeys here.
+  if (!Number.isSafeInteger(id) || id <= 0) return json({ ok: false, error: 'not_found' }, 404);
+  const [{ meta }] = await env.DB.batch([
+    env.DB.prepare('DELETE FROM admin_users WHERE id = ?1').bind(id),
+    env.DB.prepare('DELETE FROM webauthn_credentials WHERE portal = ?1 AND user_id = ?2').bind('admin', id),
+  ]);
   if (!meta.changes) return json({ ok: false, error: 'not_found' }, 404);
   return json({ ok: true });
 }
