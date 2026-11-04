@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createHash } = require('crypto');
+const { jsonForHtml } = require('./shared/json-for-html.cjs');
 
 const ROOT = __dirname;
 const SRC = path.join(ROOT, 'src');
@@ -454,7 +455,7 @@ function buildPage(loc, dirName, site, strings, images, alternates, ogAlternates
       ogAlternates,
       locales: localesForSwitcher,
       // JS 文案（main.js / ai-chat.js / fireworks 经 window.__I18N 取串）
-      i18n: JSON.stringify({ locale: loc.code, ...strings.js }),
+      i18n: jsonForHtml({ locale: loc.code, ...strings.js }),
     },
   };
 
@@ -549,7 +550,7 @@ function buildPage(loc, dirName, site, strings, images, alternates, ogAlternates
   }
   html = html.replace(
     '</head>',
-    `  <script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}</script>\n</head>`
+    `  <script type="application/ld+json">${jsonForHtml({ '@context': 'https://schema.org', '@graph': graph })}</script>\n</head>`
   );
 
   // 图片增强（WebP srcset / picture 回退）+ 首屏 hero preload；无 sharp 时 images 为空原样输出

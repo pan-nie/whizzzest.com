@@ -10,6 +10,7 @@
  * 封面：R2 whizzzest-media（attra/ 前缀）经 /media/* 代理，或站内路径 /assets/img/…。
  */
 import { UI, LOCALES } from './strings.js';
+import { jsonForHtml } from '../shared/json-for-html.cjs';
 
 const SITE_URL = 'https://whizzzest.com';
 
@@ -249,10 +250,10 @@ function pageShell(chrome, loc, { title, description, url, body, jsonLd }) {
   const jsV = chrome.meta['/assets/js/main.js'] || '';
   const ogImage = '/assets/img/longhu_yanhuowanhui.jpeg';
   const ld = jsonLd
-    ? `  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>\n`
+    ? `  <script type="application/ld+json">${jsonForHtml(jsonLd)}</script>\n`
     : '';
   // main.js 的 UI 文案表：构建产物 build-meta.json 携带 per-locale js 串（与静态页 head 注入同源）
-  const i18nJs = `  <script>window.__I18N=${JSON.stringify(chrome.meta.i18n?.[loc] || {})}</script>\n`;
+  const i18nJs = `  <script>window.__I18N=${jsonForHtml(chrome.meta.i18n?.[loc] || {})}</script>\n`;
   return `<!DOCTYPE html>
 <html lang="${L.htmlLang}">
 <head>
