@@ -127,6 +127,12 @@ export function createWebAuthn(cfg) {
       const method = request.method;
       const rpID = url.hostname;
       const origin = url.origin;
+      // SameSite cookies also accompany sibling subdomains. Guard every mutation
+      // here because callers dispatch WebAuthn before their normal Origin checks.
+      const suppliedOrigin = request.headers.get('origin');
+      if (method !== 'GET' && method !== 'HEAD' && suppliedOrigin !== null && suppliedOrigin !== origin) {
+        return json({ ok: false, error: 'bad_origin' }, {}, 403);
+      }
       const secret = cfg.secret(env);
       if (!secret) return json({ ok: false, error: 'config' }, {}, 500);
 
