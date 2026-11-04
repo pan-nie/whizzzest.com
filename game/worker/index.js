@@ -1,140 +1,77 @@
-/**
- * 焰境游戏 — game.whizzzest.com Worker（docs/游戏方案.md §1，docs/游戏整合方案.md §1.7）
- *
- * 静态资产优先：命中资产的请求由 Workers Static Assets 直接服务（不过 Worker，省调用，
- * 安全头由 public/_headers 统一补）；未命中的进到这里做显式路由
- * （wrangler.jsonc 已关 html_handling：默认 auto-trailing-slash 会对 *.html 直接取用回 307，
- *   ASSETS.fetch 不跟随，故 / 与 /play/* 必须在这里重写）：
- *   - /            → /index.html（游戏库列表页）
- *   - /play/<id>/  → /play/app.html（统一运行页壳；游戏 id 由前端 JS 校验并渲染「未找到」态）
- *   - /en、/en/    → /en/index.html（英文列表页——构建期烘出的英文静态件，源码级统一主站，§8.7）
- *   - /en/play/<id>/ → /en/play/app.html（英文运行页，同上）
- *   - 其余 /en/*   → 交还资产层：真静态件直接命中；miss 时改送 /en/404.html（英文 404，
- *                    保留原生 404 状态码，docs/游戏英文版方案.md §8.7）
- *   - /g/*         → R2 桶 whizzzest-game 反代（第三方游戏包托管，docs/游戏整合方案.md §1.1/§1.7）
- *   - /g/api/*     → win12 外部 API 白名单反代（§7.6：上游无 CORS 头/非法 CORS 头的两接口，
- *                    路径固定非开放代理；补 ACAO:* 使同源/跨域均可用）
- *   - 其余         → 交还资产层（无匹配时按 not_found_handling 返回 /404.html）
- * 阶段二绑定：R2（第三方游戏包，后续模拟器内核/ROM 同桶）；D1（云存档）仍按方案 §6 后置。
- */
 import { requireHttps } from '../../shared/https.mjs';
 
-const PLAY_RE = /^\/play\/(?:[\w.-]+)?\/?$/; // 允许 id 含点（minecraft-1.8）；仍不含斜杠，防路径穿越
-const PLAY_RE_EN = /^\/en\/play\/(?:[\w.-]+)?\/?$/; // 英文运行页同规则（前端 boot 的 id 提取正则允许 /en 前缀）
-
-/* /g/* Content-Type 兜底表（正常情况上传时已带 metadata，这里只兜漏网之鱼） */
-const MIME = {
-  html: 'text/html; charset=utf-8',
-  htm: 'text/html; charset=utf-8',
-  js: 'text/javascript; charset=utf-8',
-  mjs: 'text/javascript; charset=utf-8',
-  css: 'text/css; charset=utf-8',
-  json: 'application/json; charset=utf-8',
-  webmanifest: 'application/manifest+json',
-  png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp',
-  svg: 'image/svg+xml', ico: 'image/x-icon',
-  woff: 'font/woff', woff2: 'font/woff2', ttf: 'font/ttf', otf: 'font/otf',
-  wasm: 'application/wasm',
-  mp3: 'audio/mpeg', ogg: 'audio/ogg', wav: 'audio/wav',
-  txt: 'text/plain; charset=utf-8', xml: 'application/xml',
+// Reserved for future original games. No asset or storage bindings.
+const HEADERS = {
+  'cache-control': 'no-store',
+  'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'x-robots-tag': 'noindex, nofollow',
 };
 
-/* 第三方游戏包反代（R2 直读，对标主站 /assets-merchant/ 实现）：
- * 键 = pathname 去掉 /g/ 前缀（上传脚本 game/scripts/upload-games.mjs 与此约定一致）。
- * 缓存策略（收录迭代期以「更新即时可见」优先）：文本/代码 no-cache（ETag 条件请求，命中 304），
- * 媒体类日缓存；游戏包文件名不带 hash，不能用长强缓存——曾因 js 24h 强缓存让用户端
- * 在修复后继续吃到坏文件一天。nosniff 对齐 _headers 规范。
- * 注意：游戏包会被自家 iframe 引用，绝不能在这里补 X-Frame-Options。 */
-const TEXT_EXT = new Set(['html', 'json', 'webmanifest', 'js', 'mjs', 'css', 'txt', 'xml']);
-
-async function handleGameAsset(request, url, env) {
-  let key;
-  try {
-    key = decodeURIComponent(url.pathname.slice('/g/'.length));
-  } catch {
-    return new Response(null, { status: 404 });
-  }
-  if (!key || key.endsWith('/') || key.includes('..') || key.includes('\\')) {
-    return new Response(null, { status: 404 });
-  }
-  const obj = await env.GAMEDATA.get(key);
-  if (!obj) return new Response(null, { status: 404 });
-  const headers = new Headers();
-  obj.writeHttpMetadata(headers);
-  const ext = (key.split('.').pop() || '').toLowerCase();
-  if (!headers.has('content-type')) headers.set('content-type', MIME[ext] || 'application/octet-stream');
-  headers.set('etag', obj.httpEtag);
-  headers.set('x-content-type-options', 'nosniff');
-  headers.set('cache-control', TEXT_EXT.has(ext) ? 'no-cache' : 'public, max-age=86400');
-  if (request.headers.get('if-none-match') === obj.httpEtag) {
-    return new Response(null, { status: 304, headers });
-  }
-  return new Response(obj.body, { headers });
-}
-
-/* win12 外部 API 白名单反代（§7.6）：
- * 上游两个接口在浏览器端必挂——api.xcboke.cn 无 CORS 头、api.msn.cn 返回非法通配 `ACAO: *.msn.cn`，
- * 原站同样坏；这里固定路径反代（无任意 URL 参数，非开放代理），补 `ACAO: *`。
- * apikey 为上游项目公开于其源码的赞助接口密钥，随路径内联（本 worker 源码同为公开仓库）。 */
-const GAME_API = {
-  'lunar': {
-    upstream: 'https://api.xcboke.cn/api/calendar',
-    cache: 'public, max-age=3600',
-  },
-  'weather': {
-    upstream: 'https://api.msn.cn/weather/overview?apikey=j5i4gDqHL6nGYwx5wi5kRhXjtf2c5qgFX9fzfk0TOo&locale=zh-cn&ocid=msftweather',
-    cache: 'public, max-age=1800',
-  },
-};
-
-async function handleGameApi(request, url) {
-  if (request.method !== 'GET') return new Response(null, { status: 405 });
-  const conf = GAME_API[url.pathname.slice('/g/api/'.length)];
-  if (!conf) return new Response(null, { status: 404 });
-  try {
-    const up = await fetch(conf.upstream, { headers: { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' } });
-    const headers = new Headers();
-    headers.set('content-type', up.headers.get('content-type') || 'application/json; charset=utf-8');
-    headers.set('access-control-allow-origin', '*');
-    headers.set('cache-control', conf.cache);
-    headers.set('x-content-type-options', 'nosniff');
-    return new Response(up.body, { status: up.status, headers });
-  } catch {
-    return new Response(null, { status: 502 });
-  }
+function page(en) {
+  return `<!doctype html>
+<html lang="${en ? 'en' : 'zh-CN'}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>${en ? 'Original games · Whizzzest' : '原创游戏 · 焰境'}</title>
+  <style>
+    :root { color-scheme: light dark; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background: #f6f3ed; color: #252c29; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; display: flex; flex-direction: column; }
+    a { color: inherit; text-underline-offset: .25em; }
+    a:focus-visible { outline: 3px solid #886019; outline-offset: 6px; border-radius: 2px; }
+    header, footer { display: flex; justify-content: space-between; gap: 1.5rem; padding: 1.6rem clamp(1.5rem,6vw,6rem); font-size: .9rem; }
+    header a { display: inline-flex; align-items: center; min-height: 44px; }
+    .brand { font-weight: 650; letter-spacing: .08em; text-decoration: none; }
+    main { flex: 1; display: grid; place-content: center; width: min(100%, 64rem); margin: auto; padding: 4rem clamp(1.5rem,6vw,5rem); }
+    .seed { width: 3rem; height: 3rem; border-radius: 50% 50% 50% 0; background: #b7863f; transform: rotate(-45deg); margin: 0 0 2.8rem .6rem; }
+    .eyebrow { color: #655641; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { font-size: clamp(2.2rem,6vw,4.8rem); letter-spacing: -.04em; line-height: 1.15; max-width: 14ch; margin: 1rem 0 1.5rem; text-wrap: balance; }
+    p { max-width: 38rem; line-height: 1.85; color: #515b55; }
+    .back { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; margin-top: 1.5rem; font-weight: 600; }
+    footer { color: #515b55; border-top: 1px solid #d9d9ce; flex-wrap: wrap; }
+    @media (prefers-color-scheme: dark) {
+      :root { background: #17201c; color: #f5f3eb; }
+      p,footer { color: #c0cabe; } .eyebrow { color: #d7bb8d; }
+      footer { border-color: #39453d; } a:focus-visible { outline-color: #e8c18b; }
+    }
+  </style>
+</head>
+<body>
+  <header><a class="brand" href="https://whizzzest.com/${en ? 'en/' : ''}">${en ? 'WHIZZZEST' : '焰境 · 万载'}</a><nav aria-label="${en ? 'Language' : '语言'}"><a href="${en ? '/' : '/en/'}" lang="${en ? 'zh-CN' : 'en'}" hreflang="${en ? 'zh-CN' : 'en'}">${en ? '中文' : 'English'}</a></nav></header>
+  <main>
+    <div class="seed" aria-hidden="true"></div>
+    <span class="eyebrow">${en ? 'A space for original games' : '留一片空白，给新的想象'}</span>
+    <h1>${en ? 'Something of our own.' : '下一场冒险，<br>由我们创造。'}</h1>
+    <p>${en ? 'This space is reserved for games we create ourselves. The previous collection has been retired. There are no games available here at the moment.' : '这里将留给我们自己开发的游戏。过去的游戏合集已下线，目前暂无可玩的作品。'}</p>
+    <div><a class="back" href="https://whizzzest.com/${en ? 'en/' : ''}">${en ? 'Explore Wanzai' : '回万载看看'} <span aria-hidden="true">↗</span></a></div>
+  </main>
+  <footer><span>game.whizzzest.com</span><span>${en ? 'An idea begins with room to grow.' : '好作品，从一颗想法的种子开始。'}</span></footer>
+</body>
+</html>`;
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request) {
     const insecure = requireHttps(request);
     if (insecure) return insecure;
-    const url = new URL(request.url);
-    if (url.pathname.startsWith('/g/api/')) {
-      return handleGameApi(request, url);
+    const headers = { ...HEADERS, 'content-type': 'text/plain; charset=utf-8' };
+    if (!['GET', 'HEAD'].includes(request.method)) {
+      return new Response('Method not allowed.', { status: 405, headers: { ...headers, allow: 'GET, HEAD' } });
     }
-    if (url.pathname.startsWith('/g/')) {
-      return handleGameAsset(request, url, env);
+    const path = new URL(request.url).pathname;
+    if (path === '/robots.txt') {
+      return new Response(request.method === 'HEAD' ? null : 'User-agent: *\nDisallow: /\n', { headers });
     }
-    let asset = request;
-    if (url.pathname === '/' || url.pathname === '') {
-      asset = new Request(new URL('/index.html', url.origin), request);
-    } else if (PLAY_RE.test(url.pathname)) {
-      asset = new Request(new URL('/play/app.html', url.origin), request);
-    } else if (url.pathname === '/en' || url.pathname === '/en/') {
-      // 英文列表页：构建期产物静态件（templates + strings → public/en/，docs/游戏英文版方案.md §8.7）
-      asset = new Request(new URL('/en/index.html', url.origin), request);
-    } else if (PLAY_RE_EN.test(url.pathname)) {
-      asset = new Request(new URL('/en/play/app.html', url.origin), request);
+    if (['/', '/en', '/en/'].includes(path)) {
+      return new Response(request.method === 'HEAD' ? null : page(path !== '/'), {
+        headers: { ...headers, 'content-type': 'text/html; charset=utf-8' },
+      });
     }
-    const res = await env.ASSETS.fetch(asset);
-    // /en/* miss → 英文 404 静态件，保留原生 404 状态码（资产层把 body 解码后重包，剥编码头防错位）
-    if (res.status === 404 && (url.pathname === '/en' || url.pathname.startsWith('/en/'))) {
-      const nf = await env.ASSETS.fetch(new Request(new URL('/en/404.html', url.origin), request));
-      const headers = new Headers(nf.headers);
-      headers.delete('content-encoding');
-      headers.delete('content-length');
-      return new Response(nf.body, { status: 404, headers });
-    }
-    return res;
+    return new Response(request.method === 'HEAD' ? null : 'The previous game collection has been retired.\n原游戏合集已下线。\n', { status: 410, headers });
   },
 };

@@ -49,7 +49,6 @@
       "menu": [
         { "href": "/tv/", "label": "焰境流光" },
         { "href": "/music/", "label": "焰境仙曲" },
-        { "href": "https://game.whizzzest.com/", "label": "焰境之梦" },
         { "href": "https://im.whizzzest.com/", "label": "焰境密语" }
       ]
     },

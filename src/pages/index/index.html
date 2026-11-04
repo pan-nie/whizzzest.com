@@ -136,14 +136,14 @@
       </div>
     </section>{{/if}}
 
-    <!-- 数字体验：数字烟花 + 焰境之梦 + 焰境文库（静态入口卡） -->
+    <!-- 数字体验：数字烟花 + 焰境文库（静态入口卡） -->
     <section class="section">
       <div class="container">
         <div class="section-head reveal">
           <h2>{{data.experience.title}}</h2>
           <p>{{data.experience.desc}}</p>
         </div>
-        <div class="grid grid-3">
+        <div class="grid grid-2">
           {{#each data.experience.items as e}}
           <a class="exp-card exp-{{e.key}} reveal" href="{{e.href}}">
             <span class="exp-kicker">{{e.kicker}}</span>

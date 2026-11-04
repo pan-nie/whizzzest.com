@@ -3221,12 +3221,6 @@ a.feature-card:hover {
     linear-gradient(160deg, #2b1208, #150a05);
 }
 
-.exp-game {
-  background:
-    radial-gradient(120% 140% at 85% 0%, rgba(244, 211, 31, 0.28), transparent 55%),
-    radial-gradient(140% 120% at 15% 100%, rgba(214, 69, 36, 0.5), transparent 60%),
-    #1c0d06;
-}
 
 .exp-kicker {
   font-size: 12px;
