@@ -48,8 +48,7 @@
       "label": "Whizzzest World",
       "menu": [
         { "href": "/en/tv/", "label": "Whizzzest Streaming" },
-        { "href": "/en/music/", "label": "Whizzzest Music" },
-        { "href": "https://game.whizzzest.com/en/", "label": "Whizzzest Arcade" }
+        { "href": "/en/music/", "label": "Whizzzest Music" }
       ]
     },
     {

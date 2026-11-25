@@ -6,9 +6,9 @@
 
 **一朝相逢，便是万载。**
 
-围绕「中国花炮之乡」江西万载打造的现代化文旅数字平台——烟花文化、非遗传承、美食特产、旅游线路、数字烟花体验、AI 智能向导、在线游戏中心与端到端加密聊天，一站式呈现。
+围绕「中国花炮之乡」江西万载打造的现代化文旅数字平台——烟花文化、非遗传承、美食特产、旅游线路、数字烟花体验、AI 智能向导与端到端加密聊天，一站式呈现。
 
-[**🌐 whizzzest.com**](https://whizzzest.com) · [▶ 数字烟花](https://whizzzest.com/digital-fireworks/) · [🕹 焰境之梦](https://game.whizzzest.com/) · [📺 万载TV](https://whizzzest.com/tv/) · [💬 焰境密语](https://im.whizzzest.com/) · [🤖 AI 问答](https://whizzzest.com/)
+[**🌐 whizzzest.com**](https://whizzzest.com) · [▶ 数字烟花](https://whizzzest.com/digital-fireworks/) · [原创游戏预留区](https://game.whizzzest.com/) · [📺 万载TV](https://whizzzest.com/tv/) · [💬 焰境密语](https://im.whizzzest.com/) · [🤖 AI 问答](https://whizzzest.com/)
 
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers%20·%20D1%20·%20R2%20·%20Vectorize-F48120?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Frontend](https://img.shields.io/badge/前端运行时依赖-0-brightgreen)](#技术攻坚)
@@ -48,7 +48,7 @@
 | --- | --- | --- |
 | 🏠 主站 | [whizzzest.com](https://whizzzest.com/) | 首屏烟花影像、全模块导航 |
 | 🎆 数字烟花 | [whizzzest.com/digital-fireworks](https://whizzzest.com/digital-fireworks/) | 纯浏览器烟花模拟器，亲手放一场焰火 |
-| 🕹 焰境之梦 | [game.whizzzest.com](https://game.whizzzest.com/) | 在线游戏中心：40 款经典游戏 + DOS 怀旧专区，中英双语 |
+| 🕹 焰境之梦 | [game.whizzzest.com](https://game.whizzzest.com/) | 原创游戏预留页；原游戏合集已退役 |
 | 💬 焰境密语 | [im.whizzzest.com](https://im.whizzzest.com/) | 端到端加密聊天：好友、单聊 / 群聊、已读回执 |
 | 🤖 花傩 AI 问答 | [whizzzest.com](https://whizzzest.com/)（任意页面左下角） | 站内知识库 RAG 问答，回答附知识来源 |
 | 📺 万载 TV | [whizzzest.com/tv](https://whizzzest.com/tv/) | 短剧《一朝相逢便是万载》、宣传片、烟花实况 |
@@ -75,7 +75,7 @@
 - **沉浸式交互**：Canvas + Web Audio 数字烟花模拟器，选弹体、定节奏，浏览器里点亮一场万载焰火
 - **完整商户闭环**：展示、自助入驻、邮箱验证码登录、认证置顶，全流程打通
 - **端到端加密 IM**：「焰境密语」即时通讯——私钥仅存本机、密码包裹备份换机恢复，好友 / 群聊 / 已读回执，服务器全程只见密文
-- **游戏中心**：「焰境之梦」收录 40 款经典游戏（H5 / WebGL / Flash-Ruffle / DOS），中英双语，资产全量交付于边缘对象存储
+- **原创游戏预留区**：旧游戏合集已退役，域名保留给未来自主开发的作品；不再提供游戏包或外部 API 代理
 - **隐私零泄漏**：全站无第三方分析 / 广告 / 字体脚本，访客 IP 仅截断记录
 
 ---
@@ -96,7 +96,7 @@
 | 焰境文库 | [/library](https://whizzzest.com/library/) | 作品 / 章节双级审核的连载平台 |
 | 数字烟花 | [/digital-fireworks](https://whizzzest.com/digital-fireworks/) | 多弹体 / 特效 / 音效的烟花模拟器 |
 | 焰境好店 | [/merchants](https://whizzzest.com/merchants/) | 商户指南，自助入驻、认证置顶 |
-| 在线游戏 | [game.whizzzest.com](https://game.whizzzest.com/) | 焰境之梦游戏中心：40 款经典游戏 + DOS 专区，中英双语 |
+| 在线游戏 | [game.whizzzest.com](https://game.whizzzest.com/) | 原创游戏预留页；原游戏合集已退役 |
 | 焰境密语 | [im.whizzzest.com](https://im.whizzzest.com/) | 端到端加密聊天：好友、单聊 / 群聊、已读回执 |
 | AI 助手 | 全站任意页面 | 「花傩」智能问答，站内 RAG |
 
@@ -119,7 +119,7 @@
 | 商户门户 | `merchant.whizzzest.com` | 商户自助入驻、信息管理、认证申请 |
 | 作者门户 | `writer.whizzzest.com` | 作者注册、作品 / 章节管理、提交审核 |
 | 焰境密语 | `im.whizzzest.com` | 端到端加密即时通讯：好友、单聊 / 群聊、举报治理（独立账号体系） |
-| 焰境之梦 | `game.whizzzest.com` | 在线游戏中心：40 款经典游戏 + DOS 专区，中英双语 |
+| 焰境之梦 | `game.whizzzest.com` | 原创游戏预留页；原游戏合集已退役 |
 
 ---
 
@@ -133,10 +133,10 @@ flowchart TB
     EDGE -->|"动态请求"| MAIN["主站 Worker<br/>页面渲染 · REST API · 流式上传"]
     EDGE -->|"AI 问答"| AIW["花傩 AI 服务<br/>Workers AI + Vectorize"]
     EDGE -->|"实时消息"| IM["焰境密语 IM<br/>E2EE · Durable Objects"]
-    EDGE -->|"游戏请求"| GAME["游戏中心 Worker<br/>40 款经典游戏 · 中英双语"]
+    EDGE -->|"游戏请求"| GAME["原创游戏预留页<br/>无游戏包 · 无存储绑定"]
 
     MAIN --> D1[("Cloudflare D1<br/>SQLite 边缘数据库 · 30 张表")]
-    MAIN --> R2[("Cloudflare R2<br/>商户图片 · 媒体 · 游戏资产")]
+    MAIN --> R2[("Cloudflare R2<br/>商户图片 · 媒体")]
 
     subgraph PORTALS["统一认证壳 · 三门户独立 Worker"]
         direction LR
@@ -151,7 +151,6 @@ flowchart TB
     PORTALS --> D1
     MER --> R2
     IM --> D1
-    GAME --> R2
 ```
 
 | 层级 | 技术 | 说明 |
@@ -161,13 +160,13 @@ flowchart TB
 | **图片优化** | `sharp`（可选 devDependency） | 构建期 WebP 响应式多档生成，不装也能构建 |
 | **托管** | Cloudflare Workers + Static Assets | 静态资源直达边缘，动态路径 Worker 优先，`run_worker_first` 精细路由 |
 | **数据库** | Cloudflare D1（SQLite） | 商户、文库、TV、音乐、景点、留言、管理账号、访客分析、IM 聊天 |
-| **对象存储** | Cloudflare R2 | 三个桶（商户图片 / TV·音乐媒体 / 游戏资产），Worker 代理公开读取 |
+| **对象存储** | Cloudflare R2 | 商户图片与 TV·音乐媒体两个业务桶，Worker 代理读取；旧游戏桶待独立清理 |
 | **AI** | Cloudflare Workers AI + Vectorize | 站内推理，无需外部 API Key；RAG 检索增强生成 |
 | **认证** | WebAuthn Passkey + 邮箱验证码 | 三门户统一认证壳，管理后台叠加 Cloudflare Access 双门；IM 为独立账号体系（手机号 / 邮箱验证码） |
 | **实时通信** | Durable Objects + WebSocket | IM 实时收发（Hibernation）、在线判定、已读回执、发送限流 |
 | **邮件** | Cloudflare Workers + SMTP | 商户邮箱验证码、IM 邮箱验证码、联系表单 |
 | **PWA** | Service Worker + Web App Manifest | 离线缓存、可安装、离线兜底页 |
-| **部署** | GitHub Actions | push `main` 自动构建 + 五端 dry-run 自检 + Wrangler 部署（游戏中心随收录批次单独部署） |
+| **部署** | GitHub Actions | push `main` 自动构建、安全回归、六端 dry-run 自检与发布（含原创游戏预留页） |
 
 **性能指标**
 
@@ -206,8 +205,8 @@ manifest + Service Worker 双件套，构建期注入资源清单与脏戳；音
 **8. 端到端加密 IM「焰境密语」**
 私钥在本机生成、从不出设备（ECDH P-256），登录密码包裹私钥备份、换机凭密码恢复；单聊与群聊走信封加密，群成员变更自动重钥，服务器全程只落密文。Durable Objects（Hibernation WebSocket）承载实时收发 / typing / 在线判定 / 已读回执，好友与未读事件经轻量 activity 帧秒级推送，发送限流按发送者独立分键。代码见 `im/`。
 
-**9. 游戏中心「焰境之梦」**
-40 款经典游戏（H5 / WebGL / Flash-Ruffle / DOS 怀旧专区）中英双语站，数 GB 资产全量交付 R2 边缘对象存储、按需直连；针对老游戏做 entry 注入式适配垫片（等比缩放 / 输入重映射 / 焦点回笼 / 键盘操作提示），配合收录自愈管线（探测 404 → 回源补抓 → 定向回传）保证每款可玩。
+**9. 原创游戏预留区**
+原游戏合集及相关构建、收录、适配脚本已移出工作目录。game.whizzzest.com 仅提供中英文预留页，旧运行页、游戏资产和外部 API 路径返回 410；不绑定 R2 或静态资产。云端旧桶永久删除另行验收。
 
 ---
 
@@ -218,9 +217,9 @@ manifest + Service Worker 双件套，构建期注入资源清单与脏戳；音
 | 独立部署的 Worker | **6** 个（主站 / 管理后台 / 商户门户 / 作者门户 / IM / 游戏中心） |
 | 构建期生成的静态页面 | **15+** 页（另含动态路由） |
 | D1 数据表 | **30** 张 |
-| R2 存储桶 | **3** 个（商户图片 / TV·音乐媒体 / 游戏资产） |
+| R2 存储桶 | **2** 个活跃业务桶（商户图片 / TV·音乐媒体）；旧游戏桶待清理 |
 | Durable Objects | **3** 类（IM 聊天房间 / 在线状态 / 限流器） |
-| 游戏中心收录 | **40** 款（含 DOS 怀旧专区 12 款，中英双语） |
+| 游戏中心收录 | **0** 款；域名预留给未来原创作品 |
 | 前端运行时依赖 | **0** |
 | 后端运行时依赖 | **2**（`@simplewebauthn/server`，WebAuthn 必需；`libphonenumber-js`，手机号解析） |
 | 设计方案文档 | **21** 份（`docs/`） |
@@ -230,7 +229,7 @@ manifest + Service Worker 双件套，构建期注入资源清单与脏戳；音
 
 ## 工程化与质量保障
 
-- **CI/CD**：GitHub Actions 双阶段流水线——构建 + 五端 dry-run 自检 → 主站与四门户部署（游戏中心随收录批次单独部署）
+- **CI/CD**：GitHub Actions 双阶段流水线——构建、安全回归 + 六端 dry-run 自检 → 主站、四门户与原创游戏预留页部署
 - **本地冒烟测试**：`scripts/smoke.sh` 15 项断言一键体检全站关键路径；因边缘质询会拦截数据中心流量（CI 无法穿透），冒烟不进 CI、以本地复跑为准
 - **设计驱动开发**：21 份专项方案文档（AI 助手、文库、TV、商户、PWA、数字烟花、IM 聊天、游戏整合、访客治理等）沉淀于 `docs/`，先方案后实现，持续修订
 - **数据库迁移纪律**：`schema.sql` 为全量图纸（不可直接执行），库变更一律走 `scripts/migrations/` 编号迁移——只增不改、远程/本地双执行、先执行后合入
@@ -272,7 +271,7 @@ npx wrangler d1 execute whizzzest --local --file=scripts/migrations/007-20260914
 npx wrangler d1 execute whizzzest --local --file=scripts/migrations/008-20260914-im-member-prefs.sql
 ```
 
-部署采用 `npx wrangler deploy`（主站）+ `--config admin|merchant|writer|im|game/wrangler.jsonc`（门户子站），线上由 GitHub Actions 自动完成（游戏中心随收录批次单独部署）。模板引擎语法、新增页面指引等详见 [docs/设计架构与方案.md](docs/设计架构与方案.md)。
+部署采用 `npx wrangler deploy`（主站）+ `--config admin|merchant|writer|im|game/wrangler.jsonc`（门户子站），线上由 GitHub Actions 自动完成（包含原创游戏预留页）。模板引擎语法、新增页面指引等详见 [docs/设计架构与方案.md](docs/设计架构与方案.md)。
 
 ---
 

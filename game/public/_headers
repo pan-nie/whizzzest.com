@@ -1,6 +1,0 @@
-# 焰境游戏 — 静态资产统一安全头（Workers Assets `_headers`，对标主站规范）
-# 静态命中不经过 Worker（assets-first 直达边缘），安全头必须走本文件
-/*
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  X-Frame-Options: SAMEORIGIN

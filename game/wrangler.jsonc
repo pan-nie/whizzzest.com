@@ -1,35 +1,13 @@
 {
-  // 焰境·万载 — 游戏平台 Worker（game.whizzzest.com，docs/游戏方案.md §1/§7，docs/游戏整合方案.md §1.7）
-  // 职责（阶段一）：纯静态托管游戏站 + /play/<游戏id>/ 重写到统一运行页壳；零后端逻辑、零绑定
-  // 职责（阶段二收录向，2026-09-09）：/g/* 反代 R2 桶 whizzzest-game（第三方游戏包托管）
-  // 安全：请求统一补 X-Content-Type-Options / Referrer-Policy
-  // 后续（阶段三）：D1 + 会话（云存档）——按方案 §6 追加
+  "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "whizzzest-game",
   "workers_dev": false,
   "preview_urls": false,
   "compatibility_date": "2026-09-01",
   "main": "worker/index.js",
-  "observability": { "enabled": true },
-  // 第三方游戏包桶（收录产物经 game/scripts/upload-games.mjs 上传；模拟器内核/ROM 后续同桶）
-  // 部署前先创建：npx wrangler r2 bucket create whizzzest-game
-  "r2_buckets": [
-    {
-      "binding": "GAMEDATA",
-      "bucket_name": "whizzzest-game"
-    }
-  ],
-  "assets": {
-    "directory": "./public",
-    "binding": "ASSETS",
-    "not_found_handling": "404-page",
-    // 关闭 HTML 自动美化：默认 auto-trailing-slash 会对 *.html 直接取用返回 307，
-    // 导致 /play/<id> 重写拿不到运行页内容（ASSETS.fetch 不跟随重定向）。
-    // 路由全部显式化：/ 与 /play/* 由 worker/index.js 重写，其余资产按原路径命中。
-    "html_handling": "none",
-    // 根路径、运行页、/en/*（英文路由，docs/游戏英文版方案.md §3.3）与 /g/* 强制先过 Worker
-    // （显式路由 + R2 反代），杜绝资产层直接应答引发的缓存/路由竞态；
-    // /en/* 不补的话英文路径直达边缘，miss 落中文 404——主站英文版踩过的同款坑
-    "run_worker_first": ["/", "/play", "/play/*", "/g", "/g/*", "/en", "/en/*"]
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
   },
   "routes": [
     { "pattern": "game.whizzzest.com", "custom_domain": true }

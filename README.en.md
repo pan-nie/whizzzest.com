@@ -6,9 +6,9 @@
 
 **One glimpse, a thousand years of fire.**
 
-A modern culture & tourism platform for Wanzai, Jiangxi — "the Home of Fireworks in China". Fireworks heritage, intangible cultural heritage, local cuisine, travel routes, an in-browser fireworks simulator, an AI travel guide, an online arcade and end-to-end encrypted chat, all in one place.
+A modern culture & tourism platform for Wanzai, Jiangxi — "the Home of Fireworks in China". Fireworks heritage, intangible cultural heritage, local cuisine, travel routes, an in-browser fireworks simulator, an AI travel guide and end-to-end encrypted chat, all in one place.
 
-[**🌐 whizzzest.com**](https://whizzzest.com) · [▶ Digital Fireworks](https://whizzzest.com/digital-fireworks/) · [🕹 Whizzzest Arcade](https://game.whizzzest.com/) · [📺 Wanzai TV](https://whizzzest.com/tv/) · [💬 Whizzzest Whisper](https://im.whizzzest.com/) · [🤖 AI Guide](https://whizzzest.com/)
+[**🌐 whizzzest.com**](https://whizzzest.com) · [▶ Digital Fireworks](https://whizzzest.com/digital-fireworks/) · [Original games — reserved](https://game.whizzzest.com/) · [📺 Wanzai TV](https://whizzzest.com/tv/) · [💬 Whizzzest Whisper](https://im.whizzzest.com/) · [🤖 AI Guide](https://whizzzest.com/)
 
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers%20·%20D1%20·%20R2%20·%20Vectorize-F48120?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
 [![Frontend](https://img.shields.io/badge/frontend%20runtime%20deps-0-brightgreen)](#engineering-deep-dives)
@@ -48,7 +48,7 @@ A modern culture & tourism platform for Wanzai, Jiangxi — "the Home of Firewor
 | --- | --- | --- |
 | 🏠 Main site | [whizzzest.com](https://whizzzest.com/) | Full-screen fireworks hero, all modules |
 | 🎆 Digital Fireworks | [whizzzest.com/digital-fireworks](https://whizzzest.com/digital-fireworks/) | Pure in-browser fireworks simulator |
-| 🕹 Whizzzest Arcade | [game.whizzzest.com](https://game.whizzzest.com/) | Online game center: 40 classic titles + a retro DOS zone, in English and Chinese |
+| 🕹 Whizzzest Arcade | [game.whizzzest.com](https://game.whizzzest.com/) | Reserved for future original games; previous collection retired |
 | 💬 Whizzzest Whisper | [im.whizzzest.com](https://im.whizzzest.com/) | End-to-end encrypted chat: friends, DMs / groups, read receipts |
 | 🤖 "Huanuo" AI Guide | [whizzzest.com](https://whizzzest.com/) (bottom-left on any page) | On-site RAG Q&A with traceable sources |
 | 📺 Wanzai TV | [whizzzest.com/tv](https://whizzzest.com/tv/) | Original drama series, promos, live fireworks |
@@ -75,7 +75,7 @@ A modern culture & tourism platform for Wanzai, Jiangxi — "the Home of Firewor
 - **Immersive interaction**: a Canvas + Web Audio fireworks simulator — pick your shells, choreograph the show, light up Wanzai's night sky in the browser
 - **Complete merchant loop**: listing, self-service onboarding, email-code login, certification & pinned ranking — end to end
 - **End-to-end encrypted IM**: "Whizzzest Whisper" (焰境密语) — private keys never leave the device (password-wrapped backup for device migration); friends, group chats and read receipts, with the server only ever seeing ciphertext
-- **Game center**: "Whizzzest Arcade" (焰境之梦) — 40 classic titles (H5 / WebGL / Flash-Ruffle / DOS), bilingual, all assets delivered from edge object storage
+- **Original games**: the old collection has been retired. The domain is reserved for future original works, without game packages or external API proxies.
 - **Zero privacy leakage**: no third-party analytics / ads / font scripts anywhere
 
 ---
@@ -96,7 +96,7 @@ A modern culture & tourism platform for Wanzai, Jiangxi — "the Home of Firewor
 | Whizzzest Library | [/library](https://whizzzest.com/library/) | Serialized platform with two-level content review |
 | Digital Fireworks | [/digital-fireworks](https://whizzzest.com/digital-fireworks/) | Multi-shell, multi-effect fireworks simulator |
 | Whizzzest Shops | [/merchants](https://whizzzest.com/merchants/) | Merchant directory, self-service onboarding, certification |
-| Online games | [game.whizzzest.com](https://game.whizzzest.com/) | Whizzzest Arcade: 40 classic titles + a DOS zone, in English and Chinese |
+| Online games | [game.whizzzest.com](https://game.whizzzest.com/) | Reserved for future original games; previous collection retired |
 | Whizzzest Whisper | [im.whizzzest.com](https://im.whizzzest.com/) | End-to-end encrypted chat: friends, DMs / groups, read receipts |
 | AI guide | any page | "Huanuo" on-site RAG Q&A |
 
@@ -119,7 +119,7 @@ A modern culture & tourism platform for Wanzai, Jiangxi — "the Home of Firewor
 | Merchant portal | `merchant.whizzzest.com` | Merchant onboarding, listing management, certification |
 | Writer portal | `writer.whizzzest.com` | Writer sign-up, work / chapter management, review submission |
 | Whizzzest Whisper | `im.whizzzest.com` | End-to-end encrypted instant messaging: friends, DMs / groups, report moderation (its own account system) |
-| Whizzzest Arcade | `game.whizzzest.com` | Online game center: 40 classic titles + a DOS zone, in English and Chinese |
+| Whizzzest Arcade | `game.whizzzest.com` | Reserved for future original games; previous collection retired |
 
 ---
 
@@ -133,10 +133,10 @@ flowchart TB
     EDGE -->|"dynamic requests"| MAIN["Main Worker<br/>page rendering · REST API · streaming uploads"]
     EDGE -->|"AI Q&A"| AIW["Huanuo AI service<br/>Workers AI + Vectorize"]
     EDGE -->|"realtime chat"| IM["Whizzzest Whisper IM<br/>E2EE · Durable Objects"]
-    EDGE -->|"game requests"| GAME["Arcade Worker<br/>40 classic titles · bilingual"]
+    EDGE -->|"game requests"| GAME["Original games — reserved<br/>No game packages or storage bindings"]
 
     MAIN --> D1[("Cloudflare D1<br/>SQLite at the edge · 30 tables")]
-    MAIN --> R2[("Cloudflare R2<br/>merchant images · media · game assets")]
+    MAIN --> R2[("Cloudflare R2<br/>merchant images · media")]
 
     subgraph PORTALS["Shared auth shell · three portal Workers"]
         direction LR
@@ -151,7 +151,6 @@ flowchart TB
     PORTALS --> D1
     MER --> R2
     IM --> D1
-    GAME --> R2
 ```
 
 | Layer | Technology | Notes |
@@ -161,13 +160,13 @@ flowchart TB
 | **Image optimization** | `sharp` (optional devDependency) | Build-time responsive multi-width WebP; build works without it |
 | **Hosting** | Cloudflare Workers + Static Assets | Static from the edge, Worker-first dynamic routes via `run_worker_first` |
 | **Database** | Cloudflare D1 (SQLite) | Merchants, library, TV, music, attractions, messages, admin accounts, visitor analytics, IM chat |
-| **Object storage** | Cloudflare R2 | Three buckets (merchant images / TV·music media / game assets), proxied reads via Worker |
+| **Object storage** | Cloudflare R2 | Two active business buckets (merchant images / TV·music media), proxied via Workers; old game bucket pending cleanup |
 | **AI** | Cloudflare Workers AI + Vectorize | On-site inference, no external API keys; RAG generation |
 | **Auth** | WebAuthn Passkey + email codes | Shared auth shell across three portals; admin adds a Cloudflare Access gate; IM runs its own account system (phone / email codes) |
 | **Realtime** | Durable Objects + WebSocket | IM realtime delivery (Hibernation), presence, read receipts, send-rate limiting |
 | **Email** | Cloudflare Workers + SMTP | Merchant verification codes, IM email codes, contact forms |
 | **PWA** | Service Worker + Web App Manifest | Offline caching, installable, offline fallback page |
-| **Deployment** | GitHub Actions | push to `main` → build + five-Worker dry-run checks + Wrangler deploy (the arcade deploys separately per game batch) |
+| **Deployment** | GitHub Actions | push to `main` → build, security regressions, six-Worker dry-runs and deployment (including the reserved game domain) |
 
 **Performance**
 
@@ -206,8 +205,8 @@ Email-code login → self-service onboarding → back-office review → certific
 **8. End-to-end encrypted IM ("Whizzzest Whisper")**
 Private keys are generated on-device and never leave it (ECDH P-256), wrapped by the login password for backup and restored with the password on a new device; DMs and group chats use sealed envelopes, and group membership changes trigger automatic rekeying — the server only ever stores ciphertext. Durable Objects (Hibernation WebSockets) carry realtime delivery / typing / presence / read receipts; friend and unread events arrive as lightweight activity frames; send-rate limiting is keyed per sender. Code in `im/`.
 
-**9. The game center ("Whizzzest Arcade")**
-40 classic titles (H5 / WebGL / Flash-Ruffle / a retro DOS zone) on a bilingual site, with gigabytes of assets delivered straight from R2 edge object storage on demand; legacy games get entry-injected compatibility shims (aspect-fit scaling / input remapping / focus recapture / keyboard hints), backed by a self-healing ingestion pipeline (probe 404s → re-fetch from origin → targeted re-upload) that keeps every title playable.
+**9. A space for original games**
+The former collection, ingestion scripts and compatibility shims have been removed from the worktree. game.whizzzest.com serves only a bilingual reserved page; old play, asset and external API paths return 410. It has no R2 or static asset bindings. Permanent removal of the old cloud bucket is tracked separately.
 
 ---
 
@@ -218,9 +217,9 @@ Private keys are generated on-device and never leave it (ECDH P-256), wrapped by
 | Independently deployed Workers | **6** (main site / admin / merchant / writer / IM / arcade) |
 | Build-time static pages | **15+** (plus dynamic routes) |
 | D1 tables | **30** |
-| R2 buckets | **3** (merchant images / TV·music media / game assets) |
+| R2 buckets | **2** active business buckets (merchant images / TV·music media); old game bucket pending cleanup |
 | Durable Objects | **3** classes (IM chat rooms / presence / rate limiter) |
-| Arcade catalog | **40** titles (incl. 12 retro DOS games, bilingual) |
+| Arcade catalog | **0** titles; domain reserved for future original games |
 | Frontend runtime dependencies | **0** |
 | Backend runtime dependencies | **2** (`@simplewebauthn/server`, required for WebAuthn; `libphonenumber-js`, phone-number parsing) |
 | Design documents | **21** (in `docs/`) |
@@ -230,7 +229,7 @@ Private keys are generated on-device and never leave it (ECDH P-256), wrapped by
 
 ## Engineering Quality
 
-- **CI/CD**: a two-stage GitHub Actions pipeline — build + dry-run self-check across all five Workers → deploy the main site and the four portals (the arcade deploys separately per game batch)
+- **CI/CD**: a two-stage GitHub Actions pipeline — build, security regressions + dry-runs for six Workers → deploy the main site, four portals and reserved game page
 - **Locally reproducible smoke tests**: `scripts/smoke.sh` — 15 assertions, one command to health-check every critical path. Smoke tests deliberately stay out of CI: the edge challenge blocks datacenter traffic, so they run locally
 - **Design-driven development**: 21 design documents (AI assistant, library, TV, merchants, PWA, digital fireworks, IM chat, game ingestion, visitor governance, …) live in `docs/` — design first, then implement, continuously revised
 - **Disciplined DB migrations**: `schema.sql` is the full-schema blueprint (not directly executable); all changes go through numbered migrations in `scripts/migrations/` — additive-only, applied to both remote and local, executed before merge
@@ -272,7 +271,7 @@ npx wrangler d1 execute whizzzest --local --file=scripts/migrations/007-20260914
 npx wrangler d1 execute whizzzest --local --file=scripts/migrations/008-20260914-im-member-prefs.sql
 ```
 
-Deployment uses `npx wrangler deploy` (main site) plus `--config admin|merchant|writer|im|game/wrangler.jsonc` (the portal sub-sites); production is deployed automatically by GitHub Actions (the arcade deploys separately per game batch). For the template engine syntax and page-authoring guide, see [docs/设计架构与方案.md](docs/设计架构与方案.md) (Chinese).
+Deployment uses `npx wrangler deploy` (main site) plus `--config admin|merchant|writer|im|game/wrangler.jsonc` (the portal sub-sites); production is deployed automatically by GitHub Actions (including the reserved game page). For the template engine syntax and page-authoring guide, see [docs/设计架构与方案.md](docs/设计架构与方案.md) (Chinese).
 
 ---
 
