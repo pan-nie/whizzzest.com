@@ -78,12 +78,28 @@ function metadata(form) {
   return { ...fields, taken_on: takenOn, sort, status };
 }
 
-// Only baseline JPEGs from the browser encoder enter storage. App/comment segments that
-// can contain camera metadata are rejected. The small JFIF header may not carry a thumbnail.
-function jpegDimensions(bytes, maxEdge) {
+function withoutSegments(bytes, segments) {
+  if (!segments.length) return bytes;
+  const removed = segments.reduce((total, [first, last]) => total + last - first, 0);
+  const clean = new Uint8Array(bytes.length - removed);
+  let input = 0;
+  let output = 0;
+  for (const [first, last] of segments) {
+    clean.set(bytes.subarray(input, first), output);
+    output += first - input;
+    input = last;
+  }
+  clean.set(bytes.subarray(input), output);
+  return clean;
+}
+
+// Chrome includes an sRGB ICC profile in canvas JPEGs. Drop such profiles and reject
+// other ancillary segments that can carry camera metadata or embedded thumbnails.
+function readJpeg(bytes, maxEdge) {
   const end = bytes.length - 2;
   const word = (index) => bytes[index] * 256 + bytes[index + 1];
   if (bytes.length < 16 || word(0) !== 0xffd8 || word(end) !== 0xffd9) return null;
+  const profiles = [];
   let dimensions;
   let start = 2;
   while (start + 4 <= end) {
@@ -95,6 +111,9 @@ function jpegDimensions(bytes, maxEdge) {
     if (marker === 0xe0) {
       if (length !== 16 || bytes[start + 4] !== 74 || bytes[start + 5] !== 70 || bytes[start + 6] !== 73 ||
           bytes[start + 7] !== 70 || bytes[start + 8] !== 0 || bytes[next - 2] !== 0 || bytes[next - 1] !== 0) return null;
+    } else if (marker === 0xe2) {
+      if (length < 16 || String.fromCharCode(...bytes.subarray(start + 4, start + 16)) !== 'ICC_PROFILE\0') return null;
+      profiles.push([start, next]);
     } else if (marker === 0xc0) {
       if (dimensions || length < 11 || bytes[start + 4] !== 8) return null;
       const height = word(start + 5);
@@ -108,7 +127,7 @@ function jpegDimensions(bytes, maxEdge) {
         const escaped = bytes[++i];
         if (escaped !== 0 && !(escaped >= 0xd0 && escaped <= 0xd7)) return null;
       }
-      return dimensions;
+      return { ...dimensions, bytes: withoutSegments(bytes, profiles) };
     } else if (![0xc4, 0xdb, 0xdd].includes(marker)) return null;
     start = next;
   }
@@ -118,9 +137,7 @@ function jpegDimensions(bytes, maxEdge) {
 async function photoUpload(form, name, size, edge) {
   const file = form.get(name);
   if (!(file instanceof File) || !file.size || file.size > size || file.type !== 'image/jpeg') return null;
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  const dimensions = jpegDimensions(bytes, edge);
-  return dimensions ? { bytes, ...dimensions } : null;
+  return readJpeg(new Uint8Array(await file.arrayBuffer()), edge);
 }
 
 function photoKeys(id, token) {

@@ -92,7 +92,9 @@ test('upload, retry, authenticated preview, bilingual publish, unpublish and cle
   const media = `/gallery-media/${id}/full.jpg`;
   const page = (pathname) => site.fetch(SITE + pathname);
 
-  assert.equal((await adminRequest('/api/gallery', { method: 'POST', body: upload(id) })).status, 201);
+  const withProfile = await sharp(full).withIccProfile('srgb').jpeg().toBuffer();
+  assert.ok((await sharp(withProfile).metadata()).icc);
+  assert.equal((await adminRequest('/api/gallery', { method: 'POST', body: upload(id, withProfile) })).status, 201);
   assert.equal((await adminRequest('/api/gallery', { method: 'POST', body: upload(id) })).status, 200);
   const record = await db.prepare('SELECT image_token FROM gallery_photos WHERE id = ?').bind(id).first();
   assert.equal((await bucket.list()).objects.length, 2);
@@ -113,7 +115,12 @@ test('upload, retry, authenticated preview, bilingual publish, unpublish and cle
   const image = await page(media);
   assert.equal(image.status, 200);
   assert.equal(image.headers.get('cache-control'), 'no-store');
-  assert.deepEqual(Buffer.from(await image.arrayBuffer()), full);
+  const imageBytes = Buffer.from(await image.arrayBuffer());
+  const stored = await sharp(imageBytes).metadata();
+  assert.equal(stored.icc, undefined);
+  assert.equal(stored.exif, undefined);
+  assert.equal(stored.width, 1200);
+  assert.ok(imageBytes.length < withProfile.length);
 
   assert.equal((await edit({ revision: 2, status: 'hidden' })).status, 200);
   assert.equal((await page(media)).status, 404);
