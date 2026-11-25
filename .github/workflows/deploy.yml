@@ -86,7 +86,12 @@ jobs:
         id: check
         env:
           HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
-        run: echo "has_token=$HAS_TOKEN" >> "$GITHUB_OUTPUT"
+        run: |
+          if [ "$GITHUB_REPOSITORY" = 'pan-nie/whizzzest.com' ] && [ "$HAS_TOKEN" != 'true' ]; then
+            echo '::error::CLOUDFLARE_API_TOKEN is required to deploy production.'
+            exit 1
+          fi
+          echo "has_token=$HAS_TOKEN" >> "$GITHUB_OUTPUT"
 
       - name: Deploy
         if: steps.check.outputs.has_token == 'true'

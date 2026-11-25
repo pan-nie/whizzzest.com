@@ -11,8 +11,10 @@
 
 主站首页和导航已撤下游戏入口。预留页随主分支自动部署，先通过构建、安全回归、`npm run test:game` 与六个 Worker 的 dry-run/运行时检查。
 
-本地原文件清理前已移至 `/private/tmp/whizzzest-game-retirement-20261104/`，并逐文件核对归档。该路径是系统临时空间，不能作为长期备份。历史代码仍可通过 Git 查询；不会自动恢复旧游戏。
+历史记录见[网站整改记录](../docs/operations/2026-11-04-security-foundation/README.md)，其中另列 R2 旧桶的清理进度。
 
-R2 旧桶的永久删除单独执行，不能将代码解绑表述为云端文件已删除。当前进度见[网站整改记录](../docs/operations/2026-11-04-security-foundation/README.md)。
+## 发布第一款原创游戏
 
-未来发布原创作品时，重新审视路由、robots/noindex、缓存、来源与素材许可；按实际需要新增经过审查的绑定，并替换相应退役检查。禁止恢复旧收录/回源脚本。
+- 自研原型《接烟花》的源码可用 `git show f003625:game/public/assets/js/games/catch-fireworks.js` 查看。同期的《花炮合合》是 2048 机制的验收原型，源码保存在同一提交的 `game/public/assets/js/games/huapao2048.js`。两份源码依赖旧运行壳里的接口，接入新站时可提取玩法代码并单独适配。
+- 为每款原创作品设置独立页面，例如 `/games/<id>/`，并记录代码、图像、音频等素材的来源与许可。
+- 发布时更新目录页、索引策略与部署测试。旧目录、`/play/*`、`/g/*` 和旧代理路径继续返回 410，使旧收藏链接与新作品地址保持独立。
