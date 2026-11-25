@@ -8,7 +8,8 @@
     "build": "node build.js",
     "test:security": "node --test scripts/test-security.mjs scripts/test-content-security.cjs scripts/test-admin-revocation.cjs scripts/test-webauthn-origin.cjs",
     "test:workers": "node scripts/test-worker-transport.cjs",
-    "test:game": "node --test scripts/test-game-retirement.cjs"
+    "test:game": "node --test scripts/test-game-retirement.cjs",
+    "test:gallery": "node --test scripts/test-gallery.cjs"
   },
   "devDependencies": {
     "png-to-ico": "^3.0.2",

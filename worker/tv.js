@@ -12,6 +12,7 @@
  */
 import { UI, LOCALES } from './strings.js';
 import { jsonForHtml } from '../shared/json-for-html.cjs';
+import { GALLERY_PREFIX } from '../shared/gallery.mjs';
 
 const SITE_URL = 'https://whizzzest.com';
 
@@ -41,8 +42,10 @@ export async function handleMedia(request, env, url) {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response(null, { status: 405, headers: { allow: 'GET' } });
   }
-  const key = decodeURIComponent(url.pathname.slice('/media/'.length));
-  if (!key || key.includes('..') || !/^[\w][\w/.-]*$/.test(key)) {
+  let key;
+  try { key = decodeURIComponent(url.pathname.slice('/media/'.length)); }
+  catch { return new Response(null, { status: 404 }); }
+  if (!key || key.startsWith(GALLERY_PREFIX) || key.includes('..') || !/^[\w][\w/.-]*$/.test(key)) {
     return new Response(null, { status: 404 });
   }
 

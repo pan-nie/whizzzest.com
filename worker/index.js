@@ -17,6 +17,7 @@ import { handleTv, handleMedia, handleTvLatest } from './tv.js';
 import { handleLibrary } from './library.js';
 import { handleMusic, handleMusicPlay, handleMusicLatest } from './music.js';
 import { handleAttractions, handleAttractionsLatest } from './attractions.js';
+import { handleGallery, handleGalleryImage } from './gallery.js';
 import { handleAiChat, handleAiConfig } from './ai.js';
 import { requireHttps } from '../shared/https.mjs';
 
@@ -95,10 +96,13 @@ export default {
     if (url.pathname === '/media' || url.pathname.startsWith('/media/')) {
       return handleMedia(request, env, url);
     }
+    if (url.pathname === '/gallery-media' || url.pathname.startsWith('/gallery-media/')) {
+      return handleGalleryImage(request, env, url);
+    }
 
     // 动态板块：/tv /library /music /attractions /merchants + EN 子树 /en/<section>
     // （docs/英文版方案.md Phase 3：UI 文案双语，D1 内容暂回退中文）
-    const mDyn = url.pathname.match(/^\/(en\/)?(tv|library|music|attractions|merchants)(\/|$)/);
+    const mDyn = url.pathname.match(/^\/(en\/)?(tv|library|music|attractions|merchants|gallery)(\/|$)/);
     let res;
     if (mDyn) {
       const loc = mDyn[1] ? 'en' : 'zh';
@@ -107,6 +111,7 @@ export default {
         : section === 'library' ? await handleLibrary(request, env, url, ctx, loc)
         : section === 'music' ? await handleMusic(request, env, url, ctx, loc)
         : section === 'attractions' ? await handleAttractions(request, env, url, ctx, loc)
+        : section === 'gallery' ? await handleGallery(request, env, url, loc)
         : await handleMerchants(request, env, url, loc);
     } else {
       // 静态资产请求

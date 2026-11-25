@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "title": "Wanzai Photo Gallery — Whizzzest",
+    "description": "Original photographs of Wanzai’s streets, landscapes and festivals, with dates and photographer credits."
+  },
+  "heading": "Wanzai Photo Gallery",
+  "intro": "Wanzai’s streets, landscapes and festivals, photographed by our team.",
+  "empty": "We’re preparing our first collection.",
+  "attractions": "Explore Wanzai’s attractions",
+  "photographer": "Photographer",
+  "license": "License",
+  "close": "Close photo",
+  "previous": "Previous page",
+  "next": "Next page",
+  "pagination": "Gallery pages"
+}

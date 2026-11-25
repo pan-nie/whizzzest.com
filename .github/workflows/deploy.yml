@@ -37,6 +37,9 @@ jobs:
       - name: Game retirement checks
         run: npm run test:game
 
+      - name: Gallery upload and publication checks
+        run: npm run test:gallery
+
       - name: Dry-run main site
         run: npx -y wrangler@4.129.0 deploy --dry-run --outdir=.wrangler-dry
 

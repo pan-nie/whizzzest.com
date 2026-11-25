@@ -384,6 +384,115 @@ button {
   color: var(--c-text-2);
 }
 
+/* 万载图库 */
+.photo-gallery {
+  padding-bottom: clamp(48px, 7vw, 96px);
+  background: var(--c-bg-alt);
+}
+
+.photo-gallery .hero-flat {
+  padding-block: clamp(42px, 7vw, 92px) clamp(30px, 5vw, 60px);
+  background: transparent;
+}
+
+.photo-gallery-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (min-width: 600px) {
+  .photo-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 960px) {
+  .photo-gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.photo-gallery-card {
+  border: 1px solid var(--c-hairline);
+  border-radius: var(--radius);
+  background: var(--c-bg);
+  overflow-wrap: anywhere;
+}
+
+.photo-gallery-card a {
+  display: block;
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  overflow: hidden;
+}
+
+.photo-gallery-card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.photo-gallery-card figcaption { padding: 18px 20px 20px; }
+.photo-gallery-card h2 { margin-bottom: 5px; font-size: 20px; line-height: 1.25; }
+.photo-gallery-card p { color: var(--c-text-2); font-size: 14px; }
+.photo-gallery-card p + p { margin-top: 3px; }
+
+.photo-gallery-empty { text-align: center; }
+.photo-gallery-empty p { color: var(--c-text-2); }
+.photo-gallery-empty a {
+  display: inline-grid;
+  min-height: 44px;
+  margin-top: 10px;
+  align-items: center;
+  color: var(--c-accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.photo-gallery-preview {
+  width: min(92vw, 1100px);
+  max-height: 92dvh;
+  margin: auto;
+  padding: clamp(12px, 2vw, 22px);
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--c-text);
+  background: var(--c-bg);
+}
+
+.photo-gallery-preview::backdrop { background: rgba(0, 0, 0, 0.74); }
+.photo-gallery-preview form { text-align: right; }
+.photo-gallery-preview button {
+  min-height: 44px;
+  padding: 0 12px;
+  color: var(--c-accent-dark);
+  font-size: 15px;
+}
+.photo-gallery-preview img {
+  max-height: 68dvh;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.photo-gallery-preview figcaption {
+  margin-top: 10px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.photo-gallery-pagination {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.photo-gallery-pagination a {
+  display: inline-grid;
+  min-height: 44px;
+  align-items: center;
+  color: var(--c-accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
 /* 返回上级链接（非遗子页等）：扁平 Hero 浅底 / 图 Hero 深底共用结构 */
 
 .hero-flat .hero-crumb,
