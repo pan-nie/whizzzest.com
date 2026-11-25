@@ -40,7 +40,8 @@
       "label": "Travel",
       "menu": [
         { "href": "/en/attractions/", "label": "Tourist attractions" },
-        { "href": "/en/tourism/", "label": "Tour routes" }
+        { "href": "/en/tourism/", "label": "Tour routes" },
+        { "href": "/en/gallery/", "label": "Photo gallery" }
       ]
     },
     {

@@ -56,6 +56,8 @@
 import { PASSKEY_DASH_JS, WA_HELPERS } from '../shared/portal-ui.js';
 import { createWebAuthn } from '../shared/webauthn.js';
 import { requireHttps } from '../shared/https.mjs';
+import { handleGalleryAdmin } from './gallery.js';
+import { GALLERY_INIT, GALLERY_PANEL } from './gallery-ui.js';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 天
 const SESSION_TTL_S = SESSION_TTL_MS / 1000;
@@ -340,6 +342,8 @@ async function handleApi(request, env, path) {
     return removeAttraction(env, Number(m[1]));
   }
   if (path === '/api/attractions/cover' && method === 'PUT') return uploadImageR2(env, request, 'attra/c-');
+
+  if (path === '/api/gallery' || path.startsWith('/api/gallery/')) return handleGalleryAdmin(request, env, path);
 
   // AI 助手「花傩」管理（docs/AI助手方案.md）：设置 / 知识库 / 用量
   if (path === '/api/ai/settings' && method === 'GET') return getAiSettings(env);
@@ -2466,6 +2470,7 @@ ${BASE_CSS}
       <a class="anav-link" id="vtab-books" href="#/books">文库</a>
       <a class="anav-link" id="vtab-music" href="#/music">音乐</a>
       <a class="anav-link" id="vtab-attra" href="#/attra">景点</a>
+      <a class="anav-link" id="vtab-gallery" href="#/gallery">图库</a>
       <a class="anav-link" id="vtab-ai" href="#/ai">AI 助手</a>
       <a class="anav-link" id="vtab-acct" href="#/acct">账号</a>
     </nav>
@@ -2492,6 +2497,7 @@ ${BASE_CSS}
     <li class="anav-drawer-item"><a class="anav-link" href="#/books">文库</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="#/music">音乐</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="#/attra">景点</a></li>
+    <li class="anav-drawer-item"><a class="anav-link" href="#/gallery">图库</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="#/acct">账号</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="https://whizzzest.com/" target="_blank" rel="noopener">前往官网 ↗</a></li>
     <li class="anav-drawer-item"><a class="anav-link" id="logout-m" href="#">退出登录</a></li>
@@ -2825,6 +2831,7 @@ ${BASE_CSS}
   <button class="more" id="atmore" type="button" style="display:none">加载更多</button>
 </div>
 
+${GALLERY_PANEL}
 <div id="view-ai" class="wrap" style="display:none">
   <div class="range">
     <span class="updated" id="ai-stats-line">加载中…</span>
@@ -2969,7 +2976,8 @@ function api(path, opts) {
 }
 
 /* ---------- 视图切换（当前板块记在 location.hash：刷新/前进后退不丢） ---------- */
-var VIEWS = ['msg', 'visit', 'merch', 'tv', 'books', 'music', 'attra', 'ai', 'acct'];
+const loadGallery = ${GALLERY_INIT};
+var VIEWS = ['msg', 'visit', 'merch', 'tv', 'books', 'music', 'attra', 'gallery', 'ai', 'acct'];
 var suppressHash = false;
 function showView(v, skipHash) {
   if (VIEWS.indexOf(v) === -1) v = 'msg';
@@ -2981,6 +2989,7 @@ function showView(v, skipHash) {
   el('view-books').style.display = v === 'books' ? '' : 'none';
   el('view-music').style.display = v === 'music' ? '' : 'none';
   el('view-attra').style.display = v === 'attra' ? '' : 'none';
+  el('view-gallery').style.display = v === 'gallery' ? '' : 'none';
   el('view-ai').style.display = v === 'ai' ? '' : 'none';
   el('view-acct').style.display = v === 'acct' ? '' : 'none';
   el('vtab-msg').classList.toggle('active', v === 'msg');
@@ -2990,6 +2999,7 @@ function showView(v, skipHash) {
   el('vtab-books').classList.toggle('active', v === 'books');
   el('vtab-music').classList.toggle('active', v === 'music');
   el('vtab-attra').classList.toggle('active', v === 'attra');
+  el('vtab-gallery').classList.toggle('active', v === 'gallery');
   el('vtab-ai').classList.toggle('active', v === 'ai');
   el('vtab-acct').classList.toggle('active', v === 'acct');
   if (v === 'msg') load(true);
@@ -2999,6 +3009,7 @@ function showView(v, skipHash) {
   if (v === 'books') loadBooks(true);
   if (v === 'music') loadMusic(true);
   if (v === 'attra') loadAttra(true);
+  if (v === 'gallery') loadGallery();
   if (v === 'ai') loadAi();
   if (v === 'acct') loadAccounts();
   if (!skipHash && '#/' + v !== location.hash) {
@@ -3546,6 +3557,7 @@ el('refresh').addEventListener('click', function () {
   else if (currentView === 'books') { loadBooks(true); }
   else if (currentView === 'music') { loadMusic(true); }
   else if (currentView === 'attra') { loadAttra(true); }
+  else if (currentView === 'gallery') { loadGallery(); }
   else if (currentView === 'acct') { loadAccounts(); }
   else { load(true); }
 });

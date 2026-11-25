@@ -254,6 +254,30 @@ CREATE TABLE IF NOT EXISTS attractions (
 );
 CREATE INDEX IF NOT EXISTS idx_attractions_pub ON attractions(status, sort, id DESC);
 
+-- 万载图库（迁移 009），只存公开资料和 R2 图片标识。deleted 表示待清理图片。
+CREATE TABLE IF NOT EXISTS gallery_photos (
+  id TEXT PRIMARY KEY NOT NULL,
+  image_token TEXT NOT NULL,
+  width INTEGER NOT NULL CHECK (width BETWEEN 1 AND 2048),
+  height INTEGER NOT NULL CHECK (height BETWEEN 1 AND 2048),
+  photographer TEXT NOT NULL,
+  taken_on TEXT NOT NULL DEFAULT '',
+  title_zh TEXT NOT NULL,
+  location_zh TEXT NOT NULL,
+  alt_zh TEXT NOT NULL,
+  license_zh TEXT NOT NULL,
+  title_en TEXT NOT NULL DEFAULT '',
+  location_en TEXT NOT NULL DEFAULT '',
+  alt_en TEXT NOT NULL DEFAULT '',
+  license_en TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'hidden', 'deleted')),
+  sort INTEGER NOT NULL DEFAULT 0,
+  revision INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_gallery_photos_status_order ON gallery_photos(status, sort, created_at DESC, id);
+
 -- 作者账号（writer.whizzzest.com，docs/文库方案.md）：与商户门户完全独立的账号体系，
 -- 同手机号/邮箱可在两边各注册（不同表不同会话密钥）；登录方式与商户一致
 -- 2026-09-06 二次迁移：phone 允许 NULL（支持纯邮箱注册），部分唯一索引仅约束非空手机号

@@ -841,6 +841,7 @@ ${DYNAMIC_SECTIONS.map(
     '/assets/js/main.js': hashFile(path.join(DIST, 'assets/js/main.js')),
     '/assets/js/home-hero.js': hashFile(path.join(DIST, 'assets/js/home-hero.js')),
     '/assets/js/music-player.js': hashFile(path.join(DIST, 'assets/js/music-player.js')),
+    '/assets/js/gallery.js': hashFile(path.join(DIST, 'assets/js/gallery.js')),
     '/assets/css/fireworks.css': hashFile(path.join(DIST, 'assets/css/fireworks.css')),
     '/assets/js/fireworks.js': hashFile(path.join(DIST, 'assets/js/fireworks.js')),
     '/assets/css/ai-chat.css': hashFile(path.join(DIST, 'assets/css/ai-chat.css')),
@@ -891,7 +892,7 @@ ${DYNAMIC_SECTIONS.map(
   // + 双语 manifest 一并入预缓存。
   const swStamp = createHash('md5').update(JSON.stringify(versions)).digest('hex').slice(0, 8);
   const precache = [
-    ...built.filter((b) => b.dir !== '404').map((b) => b.slug),
+    ...built.filter((b) => b.dir !== '404' && b.dir !== 'gallery').map((b) => b.slug),
     ...LOCALES.map((l) => `${localePrefix(l)}offline.html`),
     ...LOCALES.map((l) => `${localePrefix(l)}manifest.webmanifest`),
     '/favicon.svg',

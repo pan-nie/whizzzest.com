@@ -1,0 +1,33 @@
+<!-- {"title":"万载图库 — 焰境·万载","description":"焰境·万载团队实拍的古城街巷、山水与节庆照片，附拍摄信息和摄影署名。","ogImage":"/icons/icon-512.png"} -->
+<!DOCTYPE html>
+<html lang="{{page.htmlLang}}">
+{{> head}}
+<body>
+  {{> header}}
+  <main id="main" class="photo-gallery">
+    <section class="hero-flat">
+      <h1>{{data.heading}}</h1>
+      <p class="hero-sub">{{data.intro}}</p>
+    </section>
+
+    <div id="gallery-content">
+      <div class="container photo-gallery-empty">
+        <p>{{data.empty}}</p>
+        <a href="{{page.urlPrefix}}attractions/">{{data.attractions}}</a>
+      </div>
+    </div>
+
+    <dialog class="photo-gallery-preview" aria-labelledby="photo-gallery-preview-title">
+      <form method="dialog">
+        <button type="submit" autofocus>{{data.close}}</button>
+      </form>
+      <figure>
+        <img alt="">
+        <figcaption id="photo-gallery-preview-title"></figcaption>
+      </figure>
+    </dialog>
+    <script type="module" src="/assets/js/gallery.js"></script>
+  </main>
+  {{> footer}}
+</body>
+</html>
