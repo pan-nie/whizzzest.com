@@ -439,6 +439,7 @@ function buildPage(loc, dirName, site, strings, images, alternates, ogAlternates
     page: {
       locale: loc.code,
       htmlLang: loc.htmlLang,
+      is404: dirName === '404',
       urlPrefix: localePrefix(loc),
       ogLocale: loc.ogLocale,
       manifestHref: `${localePrefix(loc)}manifest.webmanifest`,
@@ -596,13 +597,13 @@ function validateBuilt(built, producedDirs) {
     );
 
     for (const b of pages) {
-      // 当前页的 zh 对应页 = 语言切换器的目标（有意行为），不计为降级链接
-      const zhSelf = b.slug.replace(`/${loc.urlPrefix}`, '').replace(/\/$/, '') || '/';
+      // 语言切换器的中文目标（404 指向首页）不计为降级链接。
+      const zhSwitchTarget = b.dir === '404' ? '/' : b.slug.replace(`/${loc.urlPrefix}`, '').replace(/\/$/, '') || '/';
       const hrefs = [...b.html.matchAll(/href="(\/[^"]*)"/g)].map((m) => m[1]);
       for (const raw of hrefs) {
         const target = raw.split('#')[0].split('?')[0].replace(/\/+$/, '') || '/';
         if (ASSET_PREFIXES.some((p) => target.startsWith(p) || target === p)) continue;
-        if (target === zhSelf) continue;
+        if (target === zhSwitchTarget) continue;
         if (loc.urlPrefix && (target === `/${loc.urlPrefix}` || target.startsWith(`/${loc.urlPrefix}/`))) {
           // 本语言内部链接：剥离 locale 前缀后按资产/页面判断
           const inner = target === `/${loc.urlPrefix}` ? '/' : target.slice(`/${loc.urlPrefix}`.length);
@@ -708,7 +709,7 @@ async function main() {
   /** hreflang alternate（含 x-default → 默认语言）；单语言页返回 []（head 不输出） */
   const alternatesFor = (dir) => {
     const codes = producedDirs.get(dir) || [];
-    if (codes.length < 2) return [];
+    if (dir === '404' || codes.length < 2) return [];
     return [
       ...codes.map((code) => {
         const loc = LOCALES.find((l) => l.code === code);
@@ -733,8 +734,13 @@ async function main() {
         stringsByLocale[loc.code],
         images,
         alternatesFor(dir),
-        otherLocs.map((l) => l.ogLocale),
-        otherLocs.map((l) => ({ label: l.label, hreflang: l.hreflang, href: pageSlug(l, dir) }))
+        dir === '404' ? [] : otherLocs.map((l) => l.ogLocale),
+        otherLocs.map((l) => ({
+          label: l.label,
+          hreflang: l.hreflang,
+          href: dir === '404' ? localePrefix(l) : pageSlug(l, dir),
+          mode: dir === '404' ? 'home' : 'page',
+        }))
       );
       if (page) built.push(page);
     }
@@ -856,7 +862,7 @@ ${DYNAMIC_SECTIONS.map(
     const workerCtx = {
       site: sites[loc.code],
       t: stringsByLocale[loc.code],
-      page: { locales: [{ label: other.label, hreflang: other.hreflang, href: localePrefix(other) }] },
+      page: { locales: [{ label: other.label, hreflang: other.hreflang, href: localePrefix(other), mode: 'dynamic' }] },
     };
     fs.mkdirSync(path.join(DIST, 'partials', loc.code), { recursive: true });
     for (const name of ['header', 'footer']) {

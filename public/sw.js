@@ -119,9 +119,12 @@ async function handleNavigate(request, url) {
     const hit =
       (await pages.match(request)) ||
       (url.search && (await pages.match(pageKey(url)))) ||
-      (await shell.match(pageKey(url))) ||
-      (await shell.match(offlinePage));
+      (await shell.match(pageKey(url)));
     if (hit) return hit;
+    const fallback = await shell.match(offlinePage);
+    // Static Assets may redirect the .html URL during precache. Serve its body at
+    // the requested URL because navigation requests cannot reuse a redirected response.
+    if (fallback) return new Response(fallback.body, { headers: fallback.headers });
     throw err;
   }
 }
