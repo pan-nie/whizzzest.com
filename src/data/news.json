@@ -1,0 +1,21 @@
+{
+  "heading": "万载活动公告",
+  "intro": "查看节庆、演出和场馆公告。所有时间均为北京时间。",
+  "upcoming": "即将举行",
+  "changes": "场次变更",
+  "archive": "历史公告",
+  "upcomingEmpty": "暂无已核实的近期活动。",
+  "changesEmpty": "暂无待关注的场次变更。",
+  "archiveEmpty": "暂无历史公告。",
+  "unavailable": "活动公告暂时无法加载，请稍后刷新。",
+  "scheduled": "按公告安排",
+  "rescheduled": "已改期",
+  "postponed": "延期，时间待定",
+  "cancelled": "已取消",
+  "previousDates": "原定时间",
+  "currentDates": "改期后时间",
+  "source": "查看原公告",
+  "verified": "核验于",
+  "previous": "上一页",
+  "next": "下一页"
+}

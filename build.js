@@ -898,7 +898,7 @@ ${DYNAMIC_SECTIONS.map(
   // + 双语 manifest 一并入预缓存。
   const swStamp = createHash('md5').update(JSON.stringify(versions)).digest('hex').slice(0, 8);
   const precache = [
-    ...built.filter((b) => b.dir !== '404' && b.dir !== 'gallery').map((b) => b.slug),
+    ...built.filter((b) => !['404', 'gallery', 'news'].includes(b.dir)).map((b) => b.slug),
     ...LOCALES.map((l) => `${localePrefix(l)}offline.html`),
     ...LOCALES.map((l) => `${localePrefix(l)}manifest.webmanifest`),
     '/favicon.svg',

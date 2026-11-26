@@ -173,6 +173,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; // 跨域（B站封面等）直通
   if (url.pathname.startsWith('/api/')) return;    // API 永不缓存
   if (url.pathname === '/gallery/' || url.pathname === '/en/gallery/') return;
+  if (/^\/(en\/)?news\/?$/.test(url.pathname)) return;
   if (url.pathname.startsWith('/gallery-media/')) return;
 
   // 页面导航：network-first + 缓存兜底 + offline.html

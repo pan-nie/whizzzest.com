@@ -278,6 +278,31 @@ CREATE TABLE IF NOT EXISTS gallery_photos (
 );
 CREATE INDEX IF NOT EXISTS idx_gallery_photos_status_order ON gallery_photos(status, sort, created_at DESC, id);
 
+-- 万载活动公告（迁移 010）。草稿与最近一次审核通过的公开内容独立保存。
+CREATE TABLE IF NOT EXISTS activity_notices (
+  id TEXT PRIMARY KEY NOT NULL,
+  draft TEXT NOT NULL CHECK (json_valid(draft)),
+  published TEXT CHECK (published IS NULL OR json_valid(published)),
+  revision INTEGER NOT NULL DEFAULT 1,
+  published_revision INTEGER,
+  public_state TEXT CHECK (public_state IN ('scheduled', 'rescheduled', 'postponed', 'cancelled')),
+  public_start INTEGER,
+  public_until INTEGER,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_activity_notices_public
+  ON activity_notices(public_state, public_until, public_start) WHERE published IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_activity_notices_updated ON activity_notices(updated_at DESC, id DESC);
+CREATE TABLE IF NOT EXISTS activity_notice_history (
+  notice_id TEXT NOT NULL REFERENCES activity_notices(id),
+  revision INTEGER NOT NULL,
+  action TEXT NOT NULL CHECK (action IN ('publish', 'withdraw')),
+  actor_uid INTEGER NOT NULL,
+  content TEXT NOT NULL CHECK (json_valid(content)),
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (notice_id, revision)
+);
+
 -- 作者账号（writer.whizzzest.com，docs/文库方案.md）：与商户门户完全独立的账号体系，
 -- 同手机号/邮箱可在两边各注册（不同表不同会话密钥）；登录方式与商户一致
 -- 2026-09-06 二次迁移：phone 允许 NULL（支持纯邮箱注册），部分唯一索引仅约束非空手机号

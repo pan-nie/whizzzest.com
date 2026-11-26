@@ -41,7 +41,8 @@
       "menu": [
         { "href": "/en/attractions/", "label": "Tourist attractions" },
         { "href": "/en/tourism/", "label": "Tour routes" },
-        { "href": "/en/gallery/", "label": "Photo gallery" }
+        { "href": "/en/gallery/", "label": "Photo gallery" },
+        { "href": "/en/news/", "label": "Wanzai event notices" }
       ]
     },
     {

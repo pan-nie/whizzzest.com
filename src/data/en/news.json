@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "title": "Wanzai Event Notices — Whizzzest",
+    "description": "Check dates, venues and official notices for events, performances and venue updates in Wanzai."
+  },
+  "heading": "Wanzai Event Notices",
+  "intro": "Find festival, performance and venue notices. All times are in China Standard Time.",
+  "upcoming": "Upcoming",
+  "changes": "Schedule changes",
+  "archive": "Past notices",
+  "upcomingEmpty": "There are no verified upcoming events.",
+  "changesEmpty": "There are no current schedule changes.",
+  "archiveEmpty": "There are no past notices.",
+  "unavailable": "Event notices are temporarily unavailable. Please try again shortly.",
+  "scheduled": "As announced",
+  "rescheduled": "Rescheduled",
+  "postponed": "Postponed, new date pending",
+  "cancelled": "Cancelled",
+  "previousDates": "Original dates",
+  "currentDates": "New dates",
+  "source": "View the original notice",
+  "verified": "Checked on",
+  "previous": "Previous page",
+  "next": "Next page"
+}

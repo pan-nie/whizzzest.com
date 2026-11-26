@@ -32,6 +32,8 @@
       "/attractions/*",
       "/gallery",
       "/gallery/*",
+      "/news",
+      "/news/*",
       "/gallery-media",
       "/gallery-media/*",
       "/tv",

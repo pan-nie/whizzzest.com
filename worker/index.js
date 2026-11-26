@@ -18,6 +18,7 @@ import { handleLibrary } from './library.js';
 import { handleMusic, handleMusicPlay, handleMusicLatest } from './music.js';
 import { handleAttractions, handleAttractionsLatest } from './attractions.js';
 import { handleGallery, handleGalleryImage } from './gallery.js';
+import { handleActivityNotices } from './activity-notices.js';
 import { handleAiChat, handleAiConfig } from './ai.js';
 import { requireHttps } from '../shared/https.mjs';
 
@@ -102,7 +103,7 @@ export default {
 
     // 动态板块：/tv /library /music /attractions /merchants + EN 子树 /en/<section>
     // （docs/英文版方案.md Phase 3：UI 文案双语，D1 内容暂回退中文）
-    const mDyn = url.pathname.match(/^\/(en\/)?(tv|library|music|attractions|merchants|gallery)(\/|$)/);
+    const mDyn = url.pathname.match(/^\/(en\/)?(tv|library|music|attractions|merchants|gallery|news)(\/|$)/);
     let res;
     if (mDyn) {
       const loc = mDyn[1] ? 'en' : 'zh';
@@ -112,6 +113,7 @@ export default {
         : section === 'music' ? await handleMusic(request, env, url, ctx, loc)
         : section === 'attractions' ? await handleAttractions(request, env, url, ctx, loc)
         : section === 'gallery' ? await handleGallery(request, env, url, loc)
+        : section === 'news' ? await handleActivityNotices(request, env, url, loc)
         : await handleMerchants(request, env, url, loc);
     } else {
       // 静态资产请求
