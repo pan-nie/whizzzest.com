@@ -31,6 +31,9 @@ jobs:
       - name: Build
         run: node build.js
 
+      - name: Build Opera subsite
+        run: node opera/build.mjs
+
       - name: Security regression tests
         run: npm run test:security
 
@@ -41,6 +44,10 @@ jobs:
         run: npm run test:gallery
 
       - name: Dry-run main site
+        run: npx -y wrangler@4.129.0 deploy --dry-run --outdir=.wrangler-dry
+
+      - name: Dry-run Opera subsite
+        working-directory: opera
         run: npx -y wrangler@4.129.0 deploy --dry-run --outdir=.wrangler-dry
 
       - name: Dry-run admin portal
@@ -85,6 +92,9 @@ jobs:
       - name: Build
         run: node build.js
 
+      - name: Build Opera subsite
+        run: node opera/build.mjs
+
       - name: Check API token
         id: check
         env:
@@ -103,6 +113,15 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: 67e59aecb10a2a8b4b4d525ff8ddcb56
           wranglerVersion: "4.129.0"
+
+      - name: Deploy Opera subsite
+        if: steps.check.outputs.has_token == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 67e59aecb10a2a8b4b4d525ff8ddcb56
+          wranglerVersion: "4.129.0"
+          workingDirectory: opera
 
       # 管理后台（admin.whizzzest.com，admin/ 目录独立 worker）
       - name: Deploy admin

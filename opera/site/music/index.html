@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1c1112">
+  <meta name="description" content="在梨园剧场试听原创音乐与锣鼓。">
+  <title>音乐 · 梨园剧场</title>
+  <link rel="canonical" href="https://opera.whizzzest.com/music/">
+  <link rel="stylesheet" href="/assets/theatre.css">
+  <link rel="icon" href="/game/models/ren.png" type="image/png">
+  <script type="module" src="/assets/music.mjs"></script>
+</head>
+<body>
+  <header class="site-header"><div class="shell header-row">
+    <a class="wordmark" href="/"><span class="seal" aria-hidden="true">戏</span><span>梨园剧场</span></a>
+    <nav aria-label="剧场栏目">
+      <a href="/game/">游戏</a><a href="/music/" aria-current="page">音乐</a><a href="/video/">视频</a>
+    </nav>
+  </div></header>
+  <main class="shell">
+    <section class="media-stage music-page" aria-labelledby="page-title">
+      <div class="empty-mark" aria-hidden="true">声</div>
+      <div>
+        <p class="eyebrow"><span></span> 原创曲目与锣鼓</p>
+        <h1 id="page-title">音乐</h1>
+      </div>
+    </section>
+    <section class="media-shelf" aria-labelledby="tracks-title">
+      <div class="section-heading"><h2 id="tracks-title">曲目</h2></div>
+      <p id="music-status" class="media-status" role="status">正在加载曲目…</p>
+      <ul id="tracks" class="track-list" hidden></ul>
+    </section>
+  </main>
+</body>
+</html>

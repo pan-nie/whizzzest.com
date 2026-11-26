@@ -33,6 +33,10 @@
     {
       "binding": "MEDIA",
       "bucket_name": "whizzzest-media"
+    },
+    {
+      "binding": "OPERA_MUSIC",
+      "bucket_name": "whizzzest-opera-music"
     }
   ],
   "routes": [
