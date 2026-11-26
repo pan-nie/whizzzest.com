@@ -41,7 +41,8 @@
       "menu": [
         { "href": "/attractions/", "label": "旅游景点" },
         { "href": "/tourism/", "label": "旅游线路" },
-        { "href": "/gallery/", "label": "万载图库" }
+        { "href": "/gallery/", "label": "万载图库" },
+        { "href": "/news/", "label": "万载活动公告" }
       ]
     },
     {

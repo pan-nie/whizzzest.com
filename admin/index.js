@@ -58,6 +58,8 @@ import { createWebAuthn } from '../shared/webauthn.js';
 import { requireHttps } from '../shared/https.mjs';
 import { handleGalleryAdmin } from './gallery.js';
 import { GALLERY_INIT, GALLERY_PANEL } from './gallery-ui.js';
+import { handleActivityNoticesAdmin } from './activity-notices.js';
+import { NOTICES_INIT, NOTICES_PANEL } from './activity-notices-ui.js';
 import { handleOperaMusic } from './opera-music.mjs';
 import { MUSIC_ADMIN_SCRIPT } from './music-ui.js';
 
@@ -356,6 +358,9 @@ async function handleApi(request, env, path) {
   if (path === '/api/attractions/cover' && method === 'PUT') return uploadImageR2(env, request, 'attra/c-');
 
   if (path === '/api/gallery' || path.startsWith('/api/gallery/')) return handleGalleryAdmin(request, env, path);
+  if (path === '/api/activity-notices' || path.startsWith('/api/activity-notices/')) {
+    return handleActivityNoticesAdmin(request, env, path, uid);
+  }
 
   // AI 助手「花傩」管理（docs/AI助手方案.md）：设置 / 知识库 / 用量
   if (path === '/api/ai/settings' && method === 'GET') return getAiSettings(env);
@@ -2428,6 +2433,10 @@ ${BASE_CSS}
   }
   .mgrid input:focus, .mgrid select:focus, .mgrid textarea:focus { border-color: #d64524; background: #fff; }
   .mgrid textarea { resize: vertical; line-height: 1.7; }
+  #view-notices [hidden] { display: none; }
+  #view-notices .ops { flex-wrap: wrap; align-items: center; }
+  #view-notices .mgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #view-notices .mgrid :is(input, select, textarea) { min-width: 0; width: 100%; }
   .mst { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
   .mst-pending { background: #fdeee8; color: #d64524; }
   .mst-approved { background: #e5f3e8; color: #1a7f37; }
@@ -2464,6 +2473,7 @@ ${BASE_CSS}
     .kpis { grid-template-columns: 1fr; }
     .grid3, .grid2 { grid-template-columns: 1fr; }
     .mgrid { grid-template-columns: 1fr 1fr; }
+    #view-notices .mgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 560px) {
     .cards { grid-template-columns: repeat(2, 1fr); }
@@ -2485,6 +2495,7 @@ ${BASE_CSS}
       <a class="anav-link" id="vtab-music" href="#/music">音乐</a>
       <a class="anav-link" id="vtab-attra" href="#/attra">景点</a>
       <a class="anav-link" id="vtab-gallery" href="#/gallery">图库</a>
+      <a class="anav-link" id="vtab-notices" href="#/notices">公告</a>
       <a class="anav-link" id="vtab-ai" href="#/ai">AI 助手</a>
       <a class="anav-link" id="vtab-acct" href="#/acct">账号</a>
     </nav>
@@ -2512,6 +2523,7 @@ ${BASE_CSS}
     <li class="anav-drawer-item"><a class="anav-link" href="#/music">音乐</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="#/attra">景点</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="#/gallery">图库</a></li>
+    <li class="anav-drawer-item"><a class="anav-link" href="#/notices">公告</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="#/acct">账号</a></li>
     <li class="anav-drawer-item"><a class="anav-link" href="https://whizzzest.com/" target="_blank" rel="noopener">前往官网 ↗</a></li>
     <li class="anav-drawer-item"><a class="anav-link" id="logout-m" href="#">退出登录</a></li>
@@ -2852,6 +2864,7 @@ ${BASE_CSS}
 </div>
 
 ${GALLERY_PANEL}
+${NOTICES_PANEL}
 <div id="view-ai" class="wrap" style="display:none">
   <div class="range">
     <span class="updated" id="ai-stats-line">加载中…</span>
@@ -2997,7 +3010,8 @@ function api(path, opts) {
 
 /* ---------- 视图切换（当前板块记在 location.hash：刷新/前进后退不丢） ---------- */
 const loadGallery = ${GALLERY_INIT};
-var VIEWS = ['msg', 'visit', 'merch', 'tv', 'books', 'music', 'attra', 'gallery', 'ai', 'acct'];
+const loadNotices = ${NOTICES_INIT};
+var VIEWS = ['msg', 'visit', 'merch', 'tv', 'books', 'music', 'attra', 'gallery', 'notices', 'ai', 'acct'];
 var suppressHash = false;
 function showView(v, skipHash) {
   var operaMusic = v === 'music/opera';
@@ -3012,6 +3026,7 @@ function showView(v, skipHash) {
   el('view-music').style.display = v === 'music' ? '' : 'none';
   el('view-attra').style.display = v === 'attra' ? '' : 'none';
   el('view-gallery').style.display = v === 'gallery' ? '' : 'none';
+  el('view-notices').style.display = v === 'notices' ? '' : 'none';
   el('view-ai').style.display = v === 'ai' ? '' : 'none';
   el('view-acct').style.display = v === 'acct' ? '' : 'none';
   el('vtab-msg').classList.toggle('active', v === 'msg');
@@ -3022,6 +3037,7 @@ function showView(v, skipHash) {
   el('vtab-music').classList.toggle('active', v === 'music');
   el('vtab-attra').classList.toggle('active', v === 'attra');
   el('vtab-gallery').classList.toggle('active', v === 'gallery');
+  el('vtab-notices').classList.toggle('active', v === 'notices');
   el('vtab-ai').classList.toggle('active', v === 'ai');
   el('vtab-acct').classList.toggle('active', v === 'acct');
   if (v === 'msg') load(true);
@@ -3032,6 +3048,7 @@ function showView(v, skipHash) {
   if (v === 'music') selectMusicLibrary(operaMusic ? 'opera' : 'wanzai');
   if (v === 'attra') loadAttra(true);
   if (v === 'gallery') loadGallery();
+  if (v === 'notices') loadNotices();
   if (v === 'ai') loadAi();
   if (v === 'acct') loadAccounts();
   var viewPath = operaMusic ? 'music/opera' : v;
@@ -3581,6 +3598,7 @@ el('refresh').addEventListener('click', function () {
   else if (currentView === 'music') { loadMusic(true); }
   else if (currentView === 'attra') { loadAttra(true); }
   else if (currentView === 'gallery') { loadGallery(); }
+  else if (currentView === 'notices') { loadNotices(); }
   else if (currentView === 'acct') { loadAccounts(); }
   else { load(true); }
 });

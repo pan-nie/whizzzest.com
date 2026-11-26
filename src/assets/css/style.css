@@ -627,6 +627,17 @@ button {
 
 /* 纯文字特性卡（首页核心特色） */
 
+.notice-board { padding-block: 0 64px; }
+.notice-section + .notice-section { margin-top: 40px; }
+.notice-section > h2 { margin-bottom: 12px; }
+.feature-card.notice-card { margin-block: 12px; padding: clamp(18px, 4vw, 30px); overflow-wrap: anywhere; }
+.notice-card .notice-state { font-weight: 600; margin-top: 0; }
+.feature-card.notice-card h3 { font-size: clamp(20px, 3vw, 25px); }
+.notice-times { padding-left: 1.3em; margin-top: 8px; }
+.notice-pagination { display: flex; gap: 20px; }
+.notice-card a, .notice-pagination a, .notice-spots-link a { text-decoration: underline; }
+.notice-spots-link { margin-bottom: 20px; }
+
 .feature-card {
   padding: 36px 32px;
   background: var(--c-bg-alt);
