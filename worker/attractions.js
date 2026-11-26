@@ -62,6 +62,7 @@ function bodyHtml(body) {
 async function attraHome(env, url, ctx, loc) {
   const t = UI[loc].attractions;
   const P = LOCALES[loc].prefix;
+  const sourceLang = loc === 'en' ? ' lang="zh-CN"' : '';
   const chrome = await getChrome(env, loc);
   const { results } = await env.DB
     .prepare(`SELECT slug, name, summary, tags, cover FROM attractions WHERE ${PUB_WHERE} ORDER BY sort, id DESC LIMIT 120`)
@@ -74,7 +75,7 @@ async function attraHome(env, url, ctx, loc) {
       const tags = parseTags(a.tags)
         .map((tag) => `<span>${esc(tag)}</span>`)
         .join('');
-      return `<a class="at-card" href="${P}/attractions/${esc(a.slug)}/">
+      return `<a class="at-card" href="${P}/attractions/${esc(a.slug)}/"${sourceLang}>
         <div class="at-media">${cover ? `<img src="${esc(cover)}" alt="${esc(a.name)}" loading="lazy" decoding="async">` : '<span class="at-ph" aria-hidden="true">游</span>'}</div>
         <div class="at-body">
           <h2>${esc(a.name)}</h2>
@@ -114,6 +115,7 @@ async function attraHome(env, url, ctx, loc) {
 async function attraDetail(env, url, ctx, slug, loc) {
   const t = UI[loc].attractions;
   const P = LOCALES[loc].prefix;
+  const sourceLang = loc === 'en' ? ' lang="zh-CN"' : '';
   const a = await env.DB.prepare(`SELECT * FROM attractions WHERE ${PUB_WHERE} AND slug = ?1`)
     .bind(slug)
     .first();
@@ -130,7 +132,7 @@ async function attraDetail(env, url, ctx, slug, loc) {
   const next = idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null;
   const pager = (x, cls, label) =>
     x
-      ? `<a class="${cls}" href="${P}/attractions/${esc(x.slug)}/"><i>${label}</i><b>${esc(x.name)}</b></a>`
+      ? `<a class="${cls}" href="${P}/attractions/${esc(x.slug)}/"><i>${label}</i><b${sourceLang}>${esc(x.name)}</b></a>`
       : `<span class="${cls} off"><i>${label}</i><b>—</b></span>`;
 
   const tags = parseTags(a.tags)
@@ -145,7 +147,7 @@ async function attraDetail(env, url, ctx, slug, loc) {
   ].filter(([, v]) => v);
   const infoHtml = infoRows.length
     ? `<div class="at-info">${infoRows
-        .map(([k, v]) => `<div class="at-info-row"><b>${k}</b><span>${esc(v)}</span></div>`)
+        .map(([k, v]) => `<div class="at-info-row"><b>${k}</b><span${sourceLang}>${esc(v)}</span></div>`)
         .join('')}</div>`
     : '';
 
@@ -176,15 +178,15 @@ async function attraDetail(env, url, ctx, slug, loc) {
   const body = `
     <div class="at-page">
     <section class="at-detail"><div class="container">
-      <nav class="at-crumb" aria-label="${UI[loc].crumbAria}"><a href="${P}/">${UI[loc].home}</a><span>/</span><a href="${P}/attractions/">${t.crumbAttra}</a><span>/</span><b>${esc(a.name)}</b></nav>
-      <figure class="at-heroimg">${cover ? `<img src="${esc(cover)}" alt="${esc(a.name)}" loading="eager" fetchpriority="high">` : '<span class="at-ph" aria-hidden="true">游</span>'}</figure>
-      <div class="at-head">
+      <nav class="at-crumb" aria-label="${UI[loc].crumbAria}"><a href="${P}/">${UI[loc].home}</a><span>/</span><a href="${P}/attractions/">${t.crumbAttra}</a><span>/</span><b${sourceLang}>${esc(a.name)}</b></nav>
+      <figure class="at-heroimg"${sourceLang}>${cover ? `<img src="${esc(cover)}" alt="${esc(a.name)}" loading="eager" fetchpriority="high">` : '<span class="at-ph" aria-hidden="true">游</span>'}</figure>
+      <div class="at-head"${sourceLang}>
         <h1>${esc(a.name)}</h1>
         ${tags ? `<p class="at-tags">${tags}</p>` : ''}
         <p class="at-summary">${esc(a.summary)}</p>
       </div>
       ${infoHtml}
-      ${a.body ? `<div class="at-article">${bodyHtml(a.body)}</div>` : ''}
+      ${a.body ? `<div class="at-article"${sourceLang}>${bodyHtml(a.body)}</div>` : ''}
       <div class="at-links">
         <a class="at-link" href="${P}/tourism/">${t.nearbyRoutes}</a>
         <a class="at-link" href="${P}/tv/?cat=tourism">${t.relatedVideos}</a>

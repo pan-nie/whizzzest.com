@@ -24,14 +24,12 @@
         {{/if}}
       </li>
       {{/each}}
-      <!-- 语言切换器：桌面在导航尾部；locale 注册表驱动，当前页无对应语言产物时不渲染（§1.2 不产出策略）。
-           data-locale-switch：main.js 运行时按「前缀 + 当前路径」重写 href（Worker 动态页无构建期当前页上下文，
-           构建期 href 为对应语言首页兜底；静态页重写结果与构建期一致） -->
-      <li class="nav-lang-item">{{#each page.locales as l}}<a class="nav-lang" data-locale-switch href="{{l.href}}" hreflang="{{l.hreflang}}" aria-label="{{t.nav.langSwitchAria}}: {{l.label}}">{{l.label}}</a>{{/each}}</li>
+      <!-- 静态页由构建确定对应页面，动态页由 main.js 补当前路径，404 链接到目标语言首页。 -->
+      <li class="nav-lang-item">{{#each page.locales as l}}<a class="nav-lang" data-locale-switch="{{l.mode}}" href="{{l.href}}" hreflang="{{l.hreflang}}" aria-label="{{t.nav.langSwitchAria}}: {{l.label}}">{{l.label}}</a>{{/each}}</li>
     </ul>
   </nav>
 </header>
-<div class="nav-drawer" id="nav-drawer">
+<div class="nav-drawer" id="nav-drawer" inert>
   <ul class="nav-drawer-list" aria-label="{{t.nav.pagesLabel}}">
     {{#each site.nav as item}}
     {{#if item.menu}}
@@ -47,7 +45,7 @@
     {{/unless}}
     {{/each}}
     {{#each page.locales as l}}
-    <li class="nav-drawer-item nav-drawer-lang"><a class="nav-link" data-locale-switch href="{{l.href}}" hreflang="{{l.hreflang}}" aria-label="{{t.nav.langSwitchAria}}: {{l.label}}">{{l.label}}</a></li>
+    <li class="nav-drawer-item nav-drawer-lang"><a class="nav-link" data-locale-switch="{{l.mode}}" href="{{l.href}}" hreflang="{{l.hreflang}}" aria-label="{{t.nav.langSwitchAria}}: {{l.label}}">{{l.label}}</a></li>
     {{/each}}
   </ul>
 </div>

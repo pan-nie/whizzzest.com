@@ -17,42 +17,47 @@ const t = (path, fallback) => {
   return v == null ? fallback : v;
 };
 
-/* 语言切换 href 运行时重写：Worker 动态页的页头来自构建期编译 partial（无当前页上下文），
-   构建期只写对应语言首页的兜底 href；此处按「前缀 + 当前路径」重写为逐页互指
-   （静态页构建期 href 与重写结果一致，重写幂等）。 */
-const langIsZh = (document.documentElement.lang || 'zh-CN').toLowerCase().startsWith('zh');
-for (const a of document.querySelectorAll('a[data-locale-switch]')) {
-  const here = location.pathname + location.search;
-  a.href = langIsZh
-    ? (here === '/' ? '/en/' : `/en${here}`)
-    : here.replace(/^\/en(?=\/|$)/, '') || '/';
+/* 静态页使用构建生成的路径，动态页按目标语言前缀补齐路径；404 保留首页链接。 */
+for (const a of document.querySelectorAll('a[data-locale-switch="page"], a[data-locale-switch="dynamic"]')) {
+  const target = new URL(a.href);
+  if (a.dataset.localeSwitch === 'dynamic') {
+    const path = location.pathname.replace(/^\/en(?=\/|$)/, '');
+    target.pathname = target.pathname.replace(/\/$/, '') + (path || '/');
+  }
+  target.search = location.search;
+  a.href = target.href;
 }
 
 /* 导航：汉堡菜单开合（抽屉在 header 外层，见 header.html 注释） */
 const burger = document.querySelector('.nav-burger');
 const drawer = document.getElementById('nav-drawer');
 
-function setMenu(open) {
-  if (!burger || !drawer) return;
-  burger.setAttribute('aria-expanded', String(open));
-  burger.setAttribute('aria-label', open ? t('a11y.closeMenu', '关闭菜单') : t('a11y.openMenu', '打开菜单'));
-  drawer.classList.toggle('open', open);
+if (burger && drawer) {
+  const isMenuOpen = () => burger.getAttribute('aria-expanded') === 'true';
+
+  function setMenu(open) {
+    if (open === isMenuOpen()) return;
+    burger.setAttribute('aria-expanded', String(open));
+    burger.setAttribute('aria-label', open ? t('a11y.closeMenu', '关闭菜单') : t('a11y.openMenu', '打开菜单'));
+    if (!open && drawer.contains(document.activeElement)) burger.focus({ preventScroll: true });
+    drawer.inert = !open;
+    drawer.classList.toggle('open', open);
+  }
+
+  burger.addEventListener('click', () => setMenu(!isMenuOpen()));
+  drawer.addEventListener('click', (e) => {
+    if (e.target instanceof Element && e.target.closest('a')) setMenu(false);
+  });
+  document.addEventListener('focusin', (e) => {
+    if (e.target !== burger && !drawer.contains(e.target)) setMenu(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setMenu(false);
+  });
+  matchMedia('(max-width: 833px)').addEventListener('change', (e) => {
+    if (!e.matches) setMenu(false);
+  });
 }
-
-burger?.addEventListener('click', () => {
-  setMenu(burger.getAttribute('aria-expanded') !== 'true');
-});
-
-/* 点击菜单项 / Escape / 放大窗口时关闭 */
-drawer?.addEventListener('click', (e) => {
-  if (e.target instanceof Element && e.target.closest('a')) setMenu(false);
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') setMenu(false);
-});
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 833) setMenu(false);
-});
 
 /* 当前页导航高亮（导航改版 v2.6：子页归属主题；带查询串的快捷链接不参与归属） */
 const here = location.pathname.replace(/\/index\.html$/, '/');
@@ -112,11 +117,14 @@ if (navHeader && navThemeItems.length) {
       openNavItem(item);
     });
     item.addEventListener('mouseleave', () => {
-      if (!desktopMenu()) return;
+      if (!desktopMenu() || item.contains(document.activeElement)) return;
       clearTimeout(navCloseTimer);
       navCloseTimer = setTimeout(closeAllMenus, 140);
     });
-    item.addEventListener('focusin', () => openNavItem(item));
+    item.addEventListener('focusin', () => {
+      clearTimeout(navCloseTimer);
+      openNavItem(item);
+    });
     item.addEventListener('focusout', (e) => {
       if (e.relatedTarget instanceof Node && item.contains(e.relatedTarget)) return;
       navCloseTimer = setTimeout(closeAllMenus, 10);
@@ -133,7 +141,10 @@ if (navHeader && navThemeItems.length) {
     if (e.target instanceof Element && !navHeader.contains(e.target)) closeAllMenus();
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeAllMenus();
+    if (e.key !== 'Escape') return;
+    const activePanel = document.activeElement?.closest('.nav-panel');
+    activePanel?.parentElement?.querySelector(':scope > .nav-link')?.focus({ preventScroll: true });
+    closeAllMenus();
   });
 }
 
@@ -181,6 +192,7 @@ if (lightbox) {
   const lbShare = lightbox.querySelector('.lightbox-share');
   const lbShareDl = lightbox.querySelector('#lb-share-dl');
   const lbShareShuffle = lightbox.querySelector('#lb-share-shuffle');
+  const lbClose = lightbox.querySelector('.lightbox-close');
   let lastFocus = null;
   let shareList = null; // 非 null = 分享模式（操作区可见）
   let shareIdx = -1;
@@ -201,19 +213,17 @@ if (lightbox) {
     lbImg.alt = caption || t('qr.defaultAlt', '二维码');
   };
 
-  const showLb = () => {
-    lastFocus = document.activeElement;
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    lightbox.querySelector('.lightbox-close')?.focus();
+  const showLb = (trigger) => {
+    lastFocus = trigger;
+    lightbox.showModal();
   };
 
-  const openLb = (src, caption) => {
+  const openLb = (src, caption, trigger) => {
     shareList = null;
     if (lbShare) lbShare.hidden = true;
     setLbImg(src, caption);
     lbCap.textContent = caption || '';
-    showLb();
+    showLb(trigger);
   };
 
   // 顺序轮播（docs/分享二维码方案.md v1.1）：首开固定第 1 张，「换一张」按 1→2→3→4 循环——顺序可预期，随机盲盒易困惑
@@ -225,48 +235,51 @@ if (lightbox) {
     lbShareDl.href = item.src;
   };
 
-  const openShare = (list, caption) => {
+  const openShare = (list, caption, trigger) => {
     if (!lbShare || !lbShareDl || !Array.isArray(list) || list.length === 0) return;
     shareList = list;
     shareCap = caption;
     lbShare.hidden = false;
     applyShare(0);
     lbCap.textContent = caption || '';
-    showLb();
+    showLb(trigger);
   };
 
-  const closeLb = () => {
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
+  lightbox.addEventListener('close', () => {
     shareList = null;
     shareIdx = -1;
     if (lbShare) lbShare.hidden = true;
     if (lbShareDl) lbShareDl.removeAttribute('href');
-    lastFocus?.focus?.();
-  };
+    lastFocus?.focus({ preventScroll: true });
+    lastFocus = null;
+  });
 
   document.addEventListener('click', (e) => {
     const trigger = e.target instanceof Element ? e.target.closest('[data-qr],[data-qr-list]') : null;
     if (!trigger) return;
     if (trigger.dataset.qrList) {
       try {
-        openShare(JSON.parse(trigger.dataset.qrList), trigger.dataset.cap || '');
+        openShare(JSON.parse(trigger.dataset.qrList), trigger.dataset.cap || '', trigger);
       } catch {
         /* qrList 数据异常不弹窗（构建期已校验非空，此处运行时兜底） */
       }
     } else if (trigger.dataset.qr) {
-      openLb(trigger.dataset.qr, trigger.dataset.cap || '');
+      openLb(trigger.dataset.qr, trigger.dataset.cap || '', trigger);
     }
   });
   lbShareShuffle?.addEventListener('click', () => {
     if (shareList) applyShare((shareIdx + 1) % shareList.length);
   });
   lightbox.addEventListener('click', (e) => {
-    if (!(e.target instanceof Element) || !e.target.closest('.lightbox-body')) closeLb();
+    if (e.target === lightbox) lightbox.close();
   });
-  lightbox.querySelector('.lightbox-close')?.addEventListener('click', closeLb);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLb();
+  lbClose.addEventListener('click', () => lightbox.close());
+  lightbox.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    const lastControl = shareList ? lbShareShuffle : lbClose;
+    if (document.activeElement !== (e.shiftKey ? lbClose : lastControl)) return;
+    e.preventDefault();
+    (e.shiftKey ? lastControl : lbClose).focus();
   });
 }
 

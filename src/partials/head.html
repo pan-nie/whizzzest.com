@@ -3,7 +3,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{{page.title}}</title>
   <meta name="description" content="{{page.description}}">
-  <link rel="canonical" href="{{page.url}}">
+  {{#if page.is404}}<meta name="robots" content="noindex">{{/if}}
+  {{#unless page.is404}}<link rel="canonical" href="{{page.url}}">{{/unless}}
   {{#each page.alternates as alt}}<link rel="alternate" hreflang="{{alt.hreflang}}" href="{{alt.href}}">
   {{/each}}  <meta name="theme-color" content="{{page.themeColor}}">
   <meta property="og:site_name" content="{{site.name}}">

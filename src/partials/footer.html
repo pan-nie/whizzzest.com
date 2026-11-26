@@ -31,11 +31,11 @@
   </div>
 </footer>
 <!-- 二维码灯箱：全站页脚常驻，页脚微信图标与关于页 [data-qr] 元素共用 -->
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="{{t.footer.lightboxLabel}}">
+<dialog class="lightbox" id="lightbox" aria-label="{{t.footer.lightboxLabel}}">
   <div class="lightbox-body">
     <button class="lightbox-close" type="button" aria-label="{{t.footer.close}}">✕</button>
-    <img src="" alt="{{t.footer.qrAlt}}">
-    <figcaption class="lightbox-cap"></figcaption>
+    <img alt="{{t.footer.qrAlt}}">
+    <p class="lightbox-cap"></p>
     <!-- 分享操作区：仅 data-qr-list 入口（分享本站）打开时显示，main.js 控显。
          下载链接 href 由 JS 指向同源 JPG 原图（download 文件名见 t.footer.shareDlName）；微信内浏览器不支持 download，
          靠提示行走「长按识别/保存」路径（docs/分享二维码方案.md） -->
@@ -47,7 +47,7 @@
       </div>
     </div>
   </div>
-</div>
+</dialog>
 <!-- AI 助手「花傩」：全站悬浮入口（docs/AI助手方案.md）；组件 DOM 由 ai-chat.js 构建，无 JS 零侵入。
      ？v= 指纹由 build.js 统一补写；动态页（/tv /library /music /attractions /merchants）共用本 partial。 -->
 <link rel="stylesheet" href="/assets/css/ai-chat.css">
