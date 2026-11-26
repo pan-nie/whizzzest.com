@@ -77,8 +77,8 @@ h1 { margin: 0 0 0 -.045em; font: 800 clamp(53px, 6.15vw, 88px)/1 var(--serif); 
 .arena canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; outline: none; }
 .stage-curtain {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(#140d11e8 0, #140d1159 14%, transparent 31%, transparent 79%, #1a0d10a8 100%),
-    radial-gradient(ellipse at 50% 52%, transparent 44%, #130a0ca6 100%);
+  background: linear-gradient(#130c14ef, #130c1482 12%, transparent 27%, transparent 78%, #160c138f 100%),
+    radial-gradient(ellipse at 50% 63%, transparent 37%, #130a0c7a 100%);
   box-shadow: inset 0 0 0 1px #ead29b37;
 }
 .scoreboard {
@@ -91,9 +91,13 @@ h1 { margin: 0 0 0 -.045em; font: 800 clamp(53px, 6.15vw, 88px)/1 var(--serif); 
 .fighter-line span { color: #c8a999; border: 1px solid #76544b; border-radius: 3px; font-size: 10px; padding: 2px 5px; line-height: 1; }
 .cpu .fighter-line, .cpu .meters { justify-content: flex-end; }
 .cpu .fighter-line b { order: 1; }
-.health { height: 9px; border: 1px solid #a28964; border-radius: 2px; background: #1a100f; overflow: hidden; }
-.health > div { height: 100%; transform-origin: left; background: linear-gradient(90deg,#4f978d,#a6ddbe); transition: transform .13s linear; }
-.cpu .health > div { transform-origin: right; background: linear-gradient(90deg,#f29c73,#ae5044); }
+.health { position: relative; height: 11px; border: 1px solid #aa8e67; border-radius: 2px; background: #1a100f; overflow: hidden; }
+.health > * { position: absolute; inset: 0; transform-origin: left; }
+.health > div { background: linear-gradient(90deg,#398987,#a6ddbe); box-shadow: inset 0 1px #fff4; }
+.cpu .health > * { transform-origin: right; }
+.cpu .health > div { background: linear-gradient(90deg,#f29c73,#ae5044); }
+.health-trail { background: #f9bd79; }
+.arena[data-phase="playing"] .health-trail { transition: transform .45s .10s ease-out; }
 .meters { display: flex; gap: 10px; align-items: center; margin-top: 5px; }
 .cpu .focus-meter { order: 1; }
 .stance { height: 3px; width: clamp(25px, 5vw, 52px); border-radius: 2px; background: #1a100f; }
@@ -122,6 +126,21 @@ h1 { margin: 0 0 0 -.045em; font: 800 clamp(53px, 6.15vw, 88px)/1 var(--serif); 
 .cue[data-tone="good"] { border-color: #548e79; background: #11241ee8; }
 .cue[data-tone="good"] span, .cue[data-tone="good"] small { color: #aee5c8; }
 .cue[data-tone="bad"] { border-color: #bb6c59; }
+.cue :empty { display: none; }
+.cue[data-tone="finish"] {
+  bottom: 32%; min-width: 0; padding: 4px 22px 8px;
+  background: #1b1018bd; border: 1px solid #ab7e555e;
+}
+.cue[data-tone="finish"] strong {
+  font-size: clamp(33px, 4.1vw, 59px); line-height: 1.04; color: #ffe3a5;
+  text-shadow: 0 2px #924e38, 0 0 22px #f8875080;
+}
+.combo {
+  color: #ffdf9a; text-shadow: 0 2px #57241d, 0 0 12px #7d3d26;
+  font: 800 clamp(17px, 2.25vw, 29px)/1.1 var(--serif); letter-spacing: .08em;
+  position: absolute; z-index: 3; top: 86px; left: 23px; pointer-events: none;
+}
+.combo[data-side="cpu"] { left: auto; right: 23px; }
 .keyboard {
   display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px;
   padding: 12px 5px 10px; margin-top: 11px; border: 1px solid #463027;
@@ -222,6 +241,8 @@ kbd { display: inline-block; white-space: nowrap; color: #edcf9e; padding: 2px 6
   .fighter-line { gap: 4px; }
   .timer-block time { font-size: 25px; }
   .stage-tag { left: 9px; bottom: 9px; font-size: 8px; }
+  .combo { top: 66px; left: 11px; }
+  .combo[data-side="cpu"] { right: 11px; }
   .keyboard { margin-top: 8px; padding: 7px 4px; }
   .selection-panel { padding: 12px 9px; }
   .panel-title { margin-bottom: 8px; }
@@ -238,5 +259,5 @@ kbd { display: inline-block; white-space: nowrap; color: #edcf9e; padding: 2px 6
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .health > div { transition: none; }
+  .arena[data-phase="playing"] .health-trail { transition: none; }
 }

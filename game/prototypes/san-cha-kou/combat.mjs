@@ -5,25 +5,28 @@ export const ROSTER = {
   ren: {
     name: '任堂惠', speed: 2.9, dash: 7.8,
     moves: {
-      light: { name: '试探刀', windup: .19, total: .46, range: 1.62, damage: 11, arc: .82, step: .46 },
-      heavy: { name: '劈面刀', windup: .68, total: 1.13, range: 2.03, damage: 24, arc: .94, step: .65 },
-      special: { name: '回身刀', windup: .55, total: .98, range: 2.30, damage: 32, arc: 1.38, step: 1.18 },
+      light: { name: '试探刀', windup: .15, active: .075, total: .39, range: 1.43, damage: 10, arc: .73, step: .36 },
+      follow: { name: '反手刀', windup: .135, active: .085, total: .43, range: 1.58, damage: 12, arc: .86, step: .54 },
+      heavy: { name: '劈面刀', windup: .43, active: .10, total: .86, range: 1.83, damage: 24, arc: .87, step: .64 },
+      special: { name: '回身刀', windup: .36, active: .125, total: .86, range: 2.10, damage: 33, arc: 1.26, step: .96 },
     },
   },
   liu: {
     name: '刘利华', speed: 3.22, dash: 9.0,
     moves: {
-      light: { name: '贴身短刀', windup: .15, total: .38, range: 1.41, damage: 10, arc: .78, step: .52 },
-      heavy: { name: '矮身撩刀', windup: .57, total: 1.00, range: 1.82, damage: 21, arc: 1.12, step: 1.04 },
-      special: { name: '伏身掠步', windup: .46, total: .88, range: 2.04, damage: 29, arc: 1.22, step: 1.62 },
+      light: { name: '贴身短刀', windup: .12, active: .075, total: .34, range: 1.24, damage: 9, arc: .78, step: .42 },
+      follow: { name: '反撩短刀', windup: .115, active: .08, total: .37, range: 1.37, damage: 11, arc: .94, step: .57 },
+      heavy: { name: '矮身撩刀', windup: .37, active: .10, total: .75, range: 1.58, damage: 21, arc: .99, step: .81 },
+      special: { name: '伏身掠步', windup: .30, active: .12, total: .76, range: 1.83, damage: 30, arc: 1.15, step: 1.17 },
     },
   },
   gao: {
     name: '高宠', speed: 2.59, dash: 7.1,
     moves: {
-      light: { name: '探枪', windup: .25, total: .56, range: 1.91, damage: 13, arc: .66, step: .42 },
-      heavy: { name: '压台枪', windup: .80, total: 1.41, range: 2.61, damage: 30, arc: .76, step: .78 },
-      special: { name: '挑车枪', windup: .68, total: 1.25, range: 2.92, damage: 39, arc: .85, step: .99 },
+      light: { name: '探枪', windup: .195, active: .085, total: .47, range: 1.90, damage: 12, arc: .51, step: .31 },
+      follow: { name: '进步点枪', windup: .165, active: .09, total: .52, range: 2.00, damage: 13, arc: .54, step: .47 },
+      heavy: { name: '压台枪', windup: .52, active: .105, total: 1.00, range: 2.31, damage: 29, arc: .58, step: .62 },
+      special: { name: '挑车枪', windup: .43, active: .13, total: .97, range: 2.48, damage: 37, arc: .71, step: .78 },
     },
   },
 };
@@ -31,7 +34,8 @@ export const ROSTER = {
 const PLAYER = 0;
 const MIN_SEPARATION = .84;
 const BOX = { x: 5.20, near: 2.62, far: -1.95 };
-const DASH_DURATION = .27;
+export const DASH_DURATION = .26;
+const BUFFER_SECONDS = .17;
 const REPLAY_SECONDS = 3.5;
 const clamp = (n, low, high) => Math.max(low, Math.min(high, n));
 
@@ -51,11 +55,17 @@ function relativeMove(fighter, advance, sidestep) {
   );
 }
 
+function inRange(attacker, target, move) {
+  const angle = targetHeading(attacker, target) - attacker.heading;
+  return Math.hypot(attacker.x - target.x, attacker.z - target.z) <= move.range &&
+    Math.cos(angle) >= Math.cos(move.arc);
+}
+
 function actor(id, x, heading) {
   return {
     id, x, z: .43, heading, hp: 100, stance: 100, focus: 0, guard: false,
     guardedAt: -Infinity, action: null, dash: null, dashReady: 0, stunUntil: 0,
-    hurtAt: -4, gait: 0, moving: 0, travel: 0,
+    reaction: null, stanceReady: 0, gait: 0, moving: 0, travel: 1, strafe: 0,
   };
 }
 
@@ -63,19 +73,22 @@ function snapshot(actor) {
   return {
     id: actor.id, x: actor.x, z: actor.z, heading: actor.heading, hp: actor.hp,
     stance: actor.stance, focus: actor.focus, guard: actor.guard,
-    stunUntil: actor.stunUntil, hurtAt: actor.hurtAt, gait: actor.gait, moving: actor.moving,
-    travel: actor.travel, action: actor.action && { ...actor.action }, dash: actor.dash && { ...actor.dash },
+    gait: actor.gait, moving: actor.moving, travel: actor.travel, strafe: actor.strafe, guardedAt: actor.guardedAt,
+    reaction: actor.reaction, action: actor.action && { ...actor.action }, dash: actor.dash,
   };
 }
 
 export class Duel {
   constructor(player, opponent, { random = Math.random, onEvent = () => {} } = {}) {
-    this.fighters = [actor(player, -1.91, Math.PI / 2), actor(opponent, 1.91, -Math.PI / 2)];
+    this.fighters = [actor(player, -1.68, Math.PI / 2), actor(opponent, 1.68, -Math.PI / 2)];
     this.random = random;
     this.onEvent = onEvent;
     this.time = 0;
     this.result = null;
-    this.ai = { think: .32, nextAttack: .92, guardUntil: 0, sidestep: 1, move: 'approach' };
+    this.endedAt = null;
+    this.hitStop = 0;
+    this.buffer = {};
+    this.ai = { think: .26, nextAttack: .76, guardUntil: 0, sidestep: 1, move: 'approach' };
     this.frames = [];
     this.events = [];
     this.nextFrame = 0;
@@ -84,51 +97,88 @@ export class Duel {
     this.record();
   }
 
-  get remaining() { return Math.max(0, ROUND_SECONDS - this.time); }
+  get remaining() { return Math.max(0, ROUND_SECONDS - (this.endedAt ?? this.time)); }
 
-  perform(index, kind, advance = 0, sidestep = 0) {
+  clearInput() { this.buffer = {}; }
+
+  perform(index, kind, direction = null) {
     const fighter = this.fighters[index];
-    if (this.result || fighter.action || fighter.dash || fighter.guard || this.time < fighter.stunUntil) return false;
+    if (this.result || fighter.dash || fighter.guard || this.time < fighter.stunUntil) return false;
+    if (fighter.action) {
+      const { kind: current, connectedAt } = fighter.action;
+      if (kind !== 'light' || current !== 'light' || connectedAt == null || this.time < connectedAt + .045) return false;
+      kind = 'follow';
+    }
     if (kind === 'dash') {
       if (this.time < fighter.dashReady) return false;
-      const vector = relativeMove(fighter, advance || sidestep ? advance : -1, sidestep);
+      const vector = direction || relativeMove(fighter, -1, 0);
       fighter.dash = { began: this.time, ...vector };
-      fighter.dashReady = this.time + .62;
+      fighter.dashReady = this.time + .51;
       this.emit({ type: 'step', index });
       return true;
     }
     const move = ROSTER[fighter.id].moves[kind];
     if (!move || (kind === 'special' && fighter.focus < MAX_FOCUS)) return false;
     if (kind === 'special') fighter.focus = 0;
-    fighter.action = { kind, began: this.time, landed: false, midCue: false };
-    this.emit({ type: kind === 'light' ? 'swing' : 'cue', index, kind, name: move.name });
+    fighter.action = { kind, began: this.time, contact: false, released: false, midCue: false };
+    if (kind === 'heavy' || kind === 'special') this.emit({ type: 'cue', index, kind, name: move.name });
     return true;
   }
 
   setGuard(fighter, requested) {
-    const guard = Boolean(requested && !fighter.action && !fighter.dash &&
-      this.time >= fighter.stunUntil && fighter.stance > 0);
+    const blockStun = fighter.guard && fighter.reaction?.type === 'block';
+    const guard = Boolean(requested && !fighter.action && !fighter.dash && fighter.stance > 0 &&
+      (blockStun || this.time >= fighter.stunUntil));
     if (guard && !fighter.guard) fighter.guardedAt = this.time;
     fighter.guard = guard;
   }
 
   step(dt, input = {}) {
-    if (this.result) return;
+    if (this.clip) return;
+    const playerMove = direction(input.horizontal || 0, input.depth || 0);
+    if (!this.result) {
+      if (input.attack) this.buffer.attack = { kind: input.attack, until: this.time + BUFFER_SECONDS };
+      if (input.dash) this.buffer.dash = {
+        direction: playerMove.x || playerMove.z ? playerMove : null, until: this.time + BUFFER_SECONDS,
+      };
+    }
+    if (this.hitStop > 0) {
+      this.hitStop = Math.max(0, this.hitStop - dt);
+      return;
+    }
     this.time += dt;
     const [player, opponent] = this.fighters;
-    this.setGuard(player, input.guard);
-    const brain = this.computer();
-    this.setGuard(opponent, brain.guard);
-    if (input.dash) this.perform(PLAYER, 'dash', input.advance, input.sidestep);
-    if (input.attack) this.perform(PLAYER, input.attack);
-    if (brain.attack) this.perform(1, brain.attack);
-    this.travel(player, opponent, dt, input.advance || 0, input.sidestep || 0);
-    this.travel(opponent, player, dt, brain.advance, brain.sidestep);
+    let opponentMove = { x: 0, z: 0 };
+    if (!this.result) {
+      // Refresh facing before reading attack inputs. Movement stays in screen space.
+      this.face(player, opponent);
+      this.face(opponent, player);
+      this.setGuard(player, input.guard);
+      const brain = this.computer();
+      this.setGuard(opponent, brain.guard);
+      const dash = this.buffer.dash;
+      const attack = this.buffer.attack;
+      if (dash && (this.time > dash.until || this.perform(PLAYER, 'dash', dash.direction))) {
+        delete this.buffer.dash;
+      }
+      if (attack && (this.time > attack.until || this.perform(PLAYER, attack.kind))) delete this.buffer.attack;
+      if (brain.attack) this.perform(1, brain.attack);
+      opponentMove = relativeMove(opponent, brain.advance, brain.sidestep);
+      const strength = Math.min(1, Math.hypot(brain.advance, brain.sidestep));
+      opponentMove.x *= strength;
+      opponentMove.z *= strength;
+    }
+    this.travel(player, dt, this.result ? { x: 0, z: 0 } : playerMove);
+    this.travel(opponent, dt, opponentMove);
     this.separate();
-    this.advanceActions();
-    if (this.time >= this.nextFrame) this.record();
-    if (player.hp <= 0 || opponent.hp <= 0 || this.remaining === 0) {
+    if (!this.result) this.advanceActions();
+    if (!this.result && (player.hp <= 0 || opponent.hp <= 0 || this.remaining === 0)) {
       this.result = player.hp === opponent.hp ? 'draw' : player.hp > opponent.hp ? 'win' : 'lose';
+      this.endedAt = this.time;
+      this.emit({ type: 'roundEnd', index: player.hp >= opponent.hp ? 0 : 1, knockout: player.hp === 0 || opponent.hp === 0 });
+    }
+    if (this.time >= this.nextFrame) this.record();
+    if (this.result && this.time >= this.endedAt + .62) {
       this.record();
       this.clip = this.makeClip();
     }
@@ -141,12 +191,16 @@ export class Duel {
     const distance = Math.hypot(cpu.x - target.x, cpu.z - target.z);
     const threat = target.action && ROSTER[target.id].moves[target.action.kind];
     const countdown = threat && target.action.began + threat.windup - this.time;
+    if (cpu.dash || this.time < cpu.stunUntil) return { advance: 0, sidestep: 0, guard: cpu.guard };
+    if (cpu.action?.kind === 'light' && cpu.action.connectedAt != null && this.time >= cpu.action.connectedAt + .065) {
+      return { advance: 0, sidestep: 0, guard: false, attack: 'light' };
+    }
     if (
-      this.time >= brain.think && !cpu.action && !cpu.dash && threat && !target.action.landed &&
-      countdown > .10 && countdown < .35 && distance < threat.range + .26
+      this.time >= brain.think && !cpu.action && threat && !target.action.released &&
+      countdown > .085 && countdown < .28 && distance < threat.range + threat.step * .55
     ) {
       brain.think = this.time + .24;
-      if (this.random() < .63) brain.guardUntil = this.time + countdown + .14;
+      if (this.random() < .59) brain.guardUntil = this.time + countdown + .19;
     }
     if (this.time < brain.guardUntil) return { advance: 0, sidestep: 0, guard: true };
     if (this.time >= brain.think) {
@@ -154,56 +208,68 @@ export class Duel {
       if (this.random() < .48) brain.sidestep *= -1;
       brain.move = this.random() < .28 ? 'circle' : 'approach';
     }
-    if (!cpu.action && !cpu.dash && this.time >= brain.nextAttack && distance < set.heavy.range + .12) {
+    if (!cpu.action && this.time >= brain.nextAttack && distance < set.heavy.range + set.heavy.step * .53) {
       let kind = 'heavy';
-      if (distance < set.light.range - .08 && this.random() < .60) kind = 'light';
+      if (distance < set.light.range + set.light.step * .32 && this.random() < .66) kind = 'light';
       if (cpu.focus >= MAX_FOCUS && this.random() < .6) kind = 'special';
-      brain.nextAttack = this.time + .90 + this.random() * .65;
+      brain.nextAttack = this.time + .70 + this.random() * .54;
       return { advance: 0, sidestep: 0, attack: kind, guard: false };
     }
-    const preferred = set.light.range * .78;
-    const advance = distance > preferred ? (brain.move === 'circle' ? .61 : .87) : distance < .91 ? -.42 : 0;
-    return { advance, sidestep: brain.sidestep * (brain.move === 'circle' ? .66 : .27), guard: false };
+    const preferred = set.light.range * .85;
+    const advance = distance > preferred ? (brain.move === 'circle' ? .58 : .9) : distance < .98 ? -.44 : 0;
+    return { advance, sidestep: brain.sidestep * (brain.move === 'circle' ? .59 : .14), guard: false };
   }
 
-  travel(fighter, target, dt, advance, sidestep) {
+  face(fighter, target) {
     const action = fighter.action;
-    const move = action && ROSTER[fighter.id].moves[action.kind];
-    if (!action || this.time - action.began < move.windup * .46) {
+    if (this.time >= fighter.stunUntil &&
+      (!action || this.time - action.began < ROSTER[fighter.id].moves[action.kind].windup * .39)) {
       fighter.heading = targetHeading(fighter, target);
     }
+  }
+
+  travel(fighter, dt, intent) {
     let x = 0;
     let z = 0;
-    if (fighter.dash) {
-      if (this.time - fighter.dash.began < DASH_DURATION) {
-        const speed = ROSTER[fighter.id].dash * (1 - .55 * (this.time - fighter.dash.began) / DASH_DURATION);
-        x = fighter.dash.x * speed;
-        z = fighter.dash.z * speed;
-      } else {
-        fighter.dash = null;
-      }
-    } else if (this.time >= fighter.stunUntil) {
-      if (action) {
-        const elapsed = this.time - action.began;
-        if (elapsed >= move.windup * .60 && elapsed <= move.windup + .07) {
-          const speed = move.step / (move.windup * .40 + .07);
-          x = Math.sin(fighter.heading) * speed;
-          z = Math.cos(fighter.heading) * speed;
-        }
-      } else if (advance || sidestep) {
-        const vector = relativeMove(fighter, advance, sidestep);
-        const speed = ROSTER[fighter.id].speed * Math.min(1, Math.hypot(advance, sidestep)) * (fighter.guard ? .40 : 1);
-        x = vector.x * speed;
-        z = vector.z * speed;
-      }
+    const { action, reaction, dash } = fighter;
+    if (dash && this.time - dash.began >= DASH_DURATION) fighter.dash = null;
+    if (reaction && this.time - reaction.at < reaction.duration + dt) {
+      const progress = (time) => 1 - (1 - clamp((time - reaction.at) / reaction.duration, 0, 1)) ** 2.4;
+      const speed = reaction.distance * (progress(this.time) - progress(this.time - dt)) / dt;
+      x = reaction.x * speed;
+      z = reaction.z * speed;
+    } else if (fighter.dash) {
+      const speed = ROSTER[fighter.id].dash * (1 - .63 * (this.time - dash.began) / DASH_DURATION);
+      x = dash.x * speed;
+      z = dash.z * speed;
+    } else if (action && !this.result) {
+      const move = ROSTER[fighter.id].moves[action.kind];
+      const start = move.windup * .56;
+      const duration = move.windup * .44 + move.active * .74;
+      const progress = (time) => {
+        const phase = clamp((time - action.began - start) / duration, 0, 1);
+        return phase * phase * (3 - 2 * phase);
+      };
+      const speed = move.step * (progress(this.time) - progress(this.time - dt)) / dt;
+      x = Math.sin(fighter.heading) * speed;
+      z = Math.cos(fighter.heading) * speed;
+    } else if (!this.result && this.time >= fighter.stunUntil) {
+      const speed = ROSTER[fighter.id].speed * (fighter.guard ? .36 : 1);
+      x = intent.x * speed;
+      z = intent.z * speed;
     }
     fighter.x = clamp(fighter.x + x * dt, -BOX.x, BOX.x);
     fighter.z = clamp(fighter.z + z * dt, BOX.far, BOX.near);
-    const walking = !fighter.action && !fighter.dash ? Math.min(1, Math.hypot(x, z) / 2.5) : 0;
-    fighter.moving += (walking - fighter.moving) * Math.min(1, dt * 12);
+    const walking = !action && !fighter.dash && this.time >= fighter.stunUntil && !this.result ?
+      Math.min(1, Math.hypot(x, z) / 2.5) : 0;
+    const blend = Math.min(1, dt * 14);
+    const forward = Math.sin(fighter.heading) * intent.x + Math.cos(fighter.heading) * intent.z;
+    const side = Math.cos(fighter.heading) * intent.x - Math.sin(fighter.heading) * intent.z;
+    fighter.moving += (walking - fighter.moving) * blend;
+    fighter.strafe += ((walking ? side : 0) - fighter.strafe) * blend;
     fighter.gait += dt * 12;
-    fighter.travel = advance < -.25 ? -1 : 1;
-    if (!fighter.guard) fighter.stance = Math.min(100, fighter.stance + dt * 20);
+    if (walking && Math.abs(forward) > .09) fighter.travel = forward < 0 ? -1 : 1;
+    if (!fighter.guard && this.time >= fighter.stanceReady) fighter.stance = Math.min(100, fighter.stance + dt * 22);
   }
 
   separate() {
@@ -220,70 +286,113 @@ export class Duel {
   }
 
   advanceActions() {
-    const ready = [];
+    const contacts = [];
     for (const [index, attacker] of this.fighters.entries()) {
       const action = attacker.action;
       if (!action) continue;
       const move = ROSTER[attacker.id].moves[action.kind];
       const elapsed = this.time - action.began;
-      if (!action.midCue && action.kind !== 'light' && elapsed >= move.windup * .55) {
+      const strong = action.kind === 'heavy' || action.kind === 'special';
+      if (!action.midCue && strong && elapsed >= move.windup * .54) {
         action.midCue = true;
         this.emit({ type: 'count', index, kind: action.kind });
       }
-      if (!action.landed && elapsed >= move.windup) {
-        action.landed = true;
-        ready.push({ index, move, kind: action.kind });
+      if (!action.released && elapsed >= move.windup) {
+        action.released = true;
+        this.emit({ type: strong ? 'gong' : 'swing', index, kind: action.kind });
+      }
+      if (!action.contact && elapsed >= move.windup && elapsed < move.windup + move.active) {
+        const target = this.fighters[1 - index];
+        if (inRange(attacker, target, move)) {
+          action.contact = true;
+          contacts.push({ index, action, move, type: this.defense(attacker, target) });
+        }
+      }
+      if (!action.contact && elapsed >= move.windup + move.active) {
+        action.contact = true;
+        if (strong) this.mark({ type: 'miss', index, kind: action.kind, name: move.name, priority: 1 });
       }
       if (elapsed >= move.total) attacker.action = null;
     }
-    for (const { index, move, kind } of ready) this.resolve(index, move, kind);
+    // Classify both contacts before applying recoil so attacks can trade on the same tick.
+    for (const contact of contacts) this.resolve(contact);
+    if (contacts.length) this.record();
   }
 
-  resolve(index, move, kind) {
+  defense(attacker, target) {
+    if (target.dash) {
+      const elapsed = this.time - target.dash.began;
+      if (elapsed >= .036 && elapsed <= .195) return 'dodge';
+    }
+    if (!target.guard || Math.cos(targetHeading(target, attacker) - target.heading) < .25) return 'hit';
+    return this.time - target.guardedAt <= .13 ? 'parry' : 'block';
+  }
+
+  react(fighter, source, type, strength, distance, duration, stun = duration) {
+    const vector = direction(fighter.x - source.x, fighter.z - source.z);
+    fighter.reaction = { at: this.time, type, strength, distance, duration, ...vector };
+    fighter.stunUntil = this.time + stun;
+    fighter.heading = targetHeading(fighter, source);
+    fighter.action = null;
+    fighter.dash = null;
+    if (type !== 'block') fighter.guard = false;
+  }
+
+  resolve({ index, action, move, type }) {
     const attacker = this.fighters[index], target = this.fighters[1 - index];
-    const angle = targetHeading(attacker, target) - attacker.heading;
-    const distance = Math.hypot(attacker.x - target.x, attacker.z - target.z);
-    if (kind !== 'light') this.emit({ type: 'gong', index, kind });
-    const inside = distance <= move.range && Math.cos(angle) >= Math.cos(move.arc);
-    const dodging = target.dash && this.time - target.dash.began <= .245;
-    if (!inside || dodging) {
-      if (dodging && distance < move.range + .64) {
-        this.focus(target, 1);
-        this.mark({ type: 'dodge', index, kind, name: move.name, priority: index === 1 ? 6 : 3 });
-      } else if (kind !== 'light') {
-        this.mark({ type: 'miss', index, kind, name: move.name, priority: 1 });
-      }
-      return;
-    }
-    if (target.guard && Math.cos(targetHeading(target, attacker) - target.heading) > -.16) {
-      if (this.time - target.guardedAt <= .185) {
-        this.focus(target, 2);
-        attacker.action = null;
-        attacker.stunUntil = this.time + .57;
-        attacker.hurtAt = this.time;
-        this.mark({ type: 'parry', index, kind, name: move.name, priority: index === 1 ? 7 : 4 });
-        return;
-      }
-      target.stance = Math.max(0, target.stance - (kind === 'light' ? 20 : 51));
+    const { kind } = action;
+    const strength = { light: 0, follow: 1, heavy: 2, special: 3 }[kind];
+    const strong = strength >= 2;
+    let freeze = 0;
+    let priority = 2;
+    if (type === 'dodge') {
+      this.focus(target, 1);
+      priority = index === 1 ? 6 : 3;
+    } else if (type === 'parry') {
+      this.focus(target, 2);
+      this.react(attacker, target, 'parry', strength, .54, .24, .49);
+      freeze = 5 / 60;
+      priority = index === 1 ? 7 : 4;
+    } else if (type === 'block') {
+      target.stance = Math.max(0, target.stance - [16, 19, 48, 63][strength]);
+      target.stanceReady = this.time + (target.stance > 0 ? .48 : .72);
       if (target.stance > 0) {
-        target.hp = Math.max(1, target.hp - (kind === 'light' ? 2 : 5));
-        this.mark({ type: 'block', index, kind, name: move.name, priority: 2 });
-        return;
+        target.hp = Math.max(1, target.hp - (strong ? 4 : 1));
+        this.react(target, attacker, 'block', strength, strong ? .44 : .19, strong ? .16 : .09);
+        freeze = (strong ? 4 : 2) / 60;
+      } else {
+        type = 'break';
+        target.hp = Math.max(0, target.hp - Math.round(move.damage * .72));
+        this.react(target, attacker, type, strength, .84, .34, .64);
+        this.focus(attacker, 1);
+        freeze = 6 / 60;
+        priority = 6;
       }
-      target.guard = false;
-      target.stunUntil = this.time + .74;
-      target.hurtAt = this.time;
-      target.hp = Math.max(0, target.hp - Math.round(move.damage * .72));
-      this.focus(attacker, 1);
-      this.mark({ type: 'break', index, kind, name: move.name, priority: target.hp <= 0 ? 10 : 5 });
-      return;
+    } else {
+      if (kind !== 'follow') this.focus(attacker, 1);
+      action.connectedAt = this.time;
+      target.hp = Math.max(0, target.hp - move.damage);
+      this.react(target, attacker, type, strength, [.23, .47, .88, 1.14][strength],
+        [.17, .23, .32, .39][strength], [.29, .30, .38, .48][strength]);
+      freeze = [3, 4, 6, 8][strength] / 60;
+      priority = [3, 4, 5, 6][strength];
     }
-    this.focus(attacker, 1);
-    target.hp = Math.max(0, target.hp - move.damage);
-    target.hurtAt = this.time;
-    target.stunUntil = this.time + (kind === 'light' ? .23 : .39);
-    target.action = null;
-    this.mark({ type: 'hit', index, kind, name: move.name, priority: target.hp <= 0 ? 10 : kind === 'light' ? 3 : 5 });
+    const knockout = target.hp === 0;
+    if (knockout) {
+      target.reaction.distance = Math.max(target.reaction.distance, 1.12);
+      target.reaction.duration = .44;
+      freeze = Math.max(freeze, 9 / 60);
+      priority = 10;
+    }
+    const vector = direction(target.x - attacker.x, target.z - attacker.z);
+    this.hitStop = Math.max(this.hitStop, freeze);
+    this.mark({
+      type, index, kind, name: move.name, priority, strength, freeze, knockout,
+      combo: type === 'hit' && kind === 'follow' ? 2 : 0,
+      x: target.x - vector.x * .34, z: target.z - vector.z * .34,
+      dx: vector.x, dz: vector.z,
+      y: type === 'dodge' ? .20 : target.id === 'liu' ? 1.04 : 1.20,
+    });
   }
 
   focus(fighter, amount) { fighter.focus = Math.min(MAX_FOCUS, fighter.focus + amount); }
@@ -305,6 +414,7 @@ export class Duel {
   }
 
   record() {
+    if (this.frames.at(-1)?.time === this.time) return;
     const frame = { time: this.time, actors: this.fighters.map(snapshot) };
     this.frames.push(frame);
     while (this.frames.length && this.frames[0].time < this.time - REPLAY_SECONDS) this.frames.shift();
@@ -344,6 +454,7 @@ export function replayFrame(frames, time) {
       heading: fighter.heading + Math.atan2(Math.sin(turn), Math.cos(turn)) * blend,
       gait: fighter.gait + (next.gait - fighter.gait) * blend,
       moving: fighter.moving + (next.moving - fighter.moving) * blend,
+      strafe: fighter.strafe + (next.strafe - fighter.strafe) * blend,
     };
   });
 }

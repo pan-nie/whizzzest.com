@@ -6,12 +6,13 @@ const ui = Object.fromEntries([...document.querySelectorAll('[id]')].map(el => [
 const cards = [...ui.roster.querySelectorAll('button[data-id]')];
 const audio = new Percussion();
 const opponentFor = { ren: 'liu', liu: 'gao', gao: 'ren' };
-const effects = new Set(['hit', 'parry', 'break', 'block']);
-const movementKeys = new Set(['w', 'a', 's', 'd', 'j', 'e', 'q', 'k', 'shift']);
+const effects = new Set(['hit', 'parry', 'break', 'block', 'dodge']);
+const movementKeys = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowleft', 'arrowdown', 'arrowright', 'j', 'e', 'q', 'k', 'shift']);
 const input = { keys: new Set(), mouseGuard: false, queued: null, dash: false };
 const hud = ['p', 'c'].map(key => ({
   name: ui[key + '-name'],
   hp: ui[key + '-health'],
+  trail: ui[key + '-health'].previousElementSibling,
   stance: ui[key + '-stance'],
   focus: ui[key + '-focus'],
   pips: [...ui[key + '-focus'].children],
@@ -23,7 +24,8 @@ let match = new Duel(selected, opponentFor[selected]);
 let view;
 let ready = false;
 let cueUntil = 0;
-let lastEffect = null;
+let impacts = [];
+let combo = null;
 let replay = null;
 let displayTime = 0;
 let previousTime;
@@ -34,6 +36,7 @@ function resetInputs() {
   input.mouseGuard = false;
   input.queued = null;
   input.dash = false;
+  match.clearInput();
 }
 
 function setText(element, label) {
@@ -51,6 +54,7 @@ function setPhase(next) {
   for (const card of cards) card.disabled = next === 'playing' || next === 'replay' || next === 'paused';
   setText(ui['mode-tag'], { selection: '对阵', playing: '对阵中', paused: '暂停', complete: '落幕', replay: '回放' }[next]);
   ui.cue.hidden = true;
+  ui.combo.hidden = true;
   resetInputs();
 }
 
@@ -61,6 +65,7 @@ function updateHud(actors, remaining) {
     if (display.hp.getAttribute('aria-valuenow') !== String(actor.hp)) {
       display.hp.setAttribute('aria-valuenow', String(actor.hp));
       display.hp.style.transform = 'scaleX(' + actor.hp / 100 + ')';
+      display.trail.style.transform = display.hp.style.transform;
     }
     const stance = Math.round(actor.stance);
     if (display.stance.getAttribute('aria-valuenow') !== String(stance)) {
@@ -80,7 +85,8 @@ function loadMatch(withEvents = false) {
   if (ready) view.setFighters(match.fighters.map(fighter => fighter.id));
   updateHud(match.fighters, ROUND_SECONDS);
   cueUntil = 0;
-  lastEffect = null;
+  impacts = [];
+  combo = null;
   replay = null;
   accumulator = 0;
 }
@@ -99,7 +105,7 @@ function startMatch() {
   audio.unlock();
   loadMatch(true);
   setPhase('playing');
-  announce('开场', '对阵开始', '用走位试探双方的攻击距离。', 'good', 1.8);
+  announce('', '开打', '', 'finish', .72);
   audio.play('begin');
   view.renderer.domElement.focus({ preventScroll: true });
 }
@@ -113,28 +119,33 @@ function announce(source, title, detail, tone = 'neutral', duration = .85) {
   cueUntil = match.time + duration;
 }
 
-function eventSound(event) {
-  if (event.type === 'hit') return 'hurt';
-  return event.type;
+function playEvent(event) {
+  audio.play(event.type, event.strength ?? (event.kind === 'follow' ? 1 : 0));
 }
 
 function onEvent(event) {
-  audio.play(eventSound(event));
-  if (effects.has(event.type)) lastEffect = event;
+  playEvent(event);
+  if (effects.has(event.type)) {
+    impacts.push(event);
+    if (impacts.length > 2) impacts.shift();
+  }
+  if (event.combo) combo = event;
   const fromPlayer = event.index === 0;
   const attacker = ROSTER[match.fighters[event.index].id].name;
+  if (event.type === 'roundEnd') {
+    announce('', event.knockout ? '击倒' : '时尽', '', 'finish', .74);
+    return;
+  }
   if (event.type === 'cue') {
-    announce(fromPlayer ? '你的起鼓' : '对手起鼓', event.name,
-      fromPlayer ? '末锣出招，留意对手走位。' : '末锣出招，准备格挡或闪步。', 'neutral', .89);
+    announce(fromPlayer ? '你的起鼓' : '对手起鼓', event.name, '', 'neutral', .59);
   }
   if (event.type === 'parry' || event.type === 'dodge') {
     const title = event.type === 'parry' ? '精准格挡' : '闪步避开';
-    announce(fromPlayer ? '电脑化解' : '你已化解', title,
-      fromPlayer ? '留意对方反击。' : '抓住对手收招的空档。', fromPlayer ? 'bad' : 'good', .96);
+    announce(fromPlayer ? '电脑化解' : '你已化解', title, '', fromPlayer ? 'bad' : 'good', .85);
   }
-  if (event.type === 'break') announce(attacker, '打破架势', '守方失衡，暂时无法还手。', fromPlayer ? 'good' : 'bad', 1.03);
-  if (event.type === 'hit' && event.kind !== 'light') {
-    announce(attacker, event.name + '命中', fromPlayer ? '对手留在攻击范围内。' : '试着在末锣前离开金色扇面。', fromPlayer ? 'good' : 'bad');
+  if (event.type === 'break') announce(attacker, '打破架势', '', fromPlayer ? 'good' : 'bad');
+  if (event.type === 'hit' && event.strength >= 2) {
+    announce(attacker, event.name + '命中', '', fromPlayer ? 'good' : 'bad');
   }
   if (event.type === 'miss' && !fromPlayer) announce('对手出招', '重招落空', '可以趁对手收招还手。', 'good');
 }
@@ -184,7 +195,7 @@ function resume() {
 function setReplayProgress(time, withSound = false) {
   if (withSound) {
     for (const event of match.clip.events) {
-      if (event.time > replay.time && event.time <= time) audio.play(eventSound(event));
+      if (event.time > replay.time && event.time <= time) playEvent(event);
     }
   }
   replay.time = time;
@@ -220,10 +231,10 @@ function closeReplay() {
 }
 
 function controls() {
-  const has = (key) => Number(input.keys.has(key));
+  const has = (key, arrow) => Number(input.keys.has(key) || input.keys.has(arrow));
   const state = {
-    advance: has('w') - has('s'),
-    sidestep: has('d') - has('a'),
+    horizontal: has('d', 'arrowright') - has('a', 'arrowleft'),
+    depth: has('s', 'arrowdown') - has('w', 'arrowup'),
     guard: input.mouseGuard || input.keys.has('k'),
     attack: input.queued,
     dash: input.dash,
@@ -294,13 +305,18 @@ function frame(timestamp) {
   displayTime += delta;
   if (phase === 'playing') {
     accumulator += delta;
-    while (accumulator >= fixedStep && !match.result) {
+    while (accumulator >= fixedStep && !match.clip) {
       accumulator -= fixedStep;
       match.step(fixedStep, controls());
     }
     if (match.time >= cueUntil) ui.cue.hidden = true;
+    ui.combo.hidden = !combo || match.time - combo.time >= .77;
+    if (!ui.combo.hidden) {
+      ui.combo.dataset.side = combo.index === 0 ? 'player' : 'cpu';
+      setText(ui.combo, combo.combo + ' 连击');
+    }
     updateHud(match.fighters, match.remaining);
-    if (match.result) finish();
+    if (match.clip) finish();
   }
   if (phase === 'replay') {
     if (replay.playing) {
@@ -309,13 +325,20 @@ function frame(timestamp) {
       if (time >= match.clip.end) toggleReplay(true);
     }
     const actors = replayFrame(match.clip.frames, replay.time);
-    const effect = match.clip.events.findLast(event => event.time <= replay.time && effects.has(event.type));
+    const effectsInClip = match.clip.events.filter(event => effects.has(event.type) && event.time <= replay.time &&
+      replay.time - event.time < .43).slice(-2).reverse().map(event => ({ event, age: replay.time - event.time }));
     updateHud(actors, ROUND_SECONDS - replay.time);
-    view.draw(actors, replay.time, { effect });
+    view.draw(actors, replay.time, { replay: true, effects: effectsInClip });
   } else {
+    const liveEffects = impacts.map(event => {
+      const since = match.time - event.time;
+      const age = since + (since === 0 ? Math.max(0, event.freeze - match.hitStop) : event.freeze);
+      return { event, age };
+    }).reverse();
     view.draw(match.fighters, phase === 'selection' ? displayTime : match.time, {
       preview: phase === 'selection',
-      effect: lastEffect,
+      delta: phase === 'paused' ? 0 : delta,
+      effects: liveEffects,
     });
   }
   requestAnimationFrame(frame);

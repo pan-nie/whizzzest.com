@@ -10,6 +10,7 @@ im/reference/
 # 依赖与本地状态
 node_modules/
 .wrangler/
+.wrangler-dry/
 .dev.vars
 .DS_Store
 

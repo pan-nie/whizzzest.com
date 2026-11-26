@@ -77,7 +77,7 @@ export class Percussion {
     this.texture(time, small ? 2200 : 1680, small ? .12 : .23, .14);
   }
 
-  play(type) {
+  play(type, strength = 0) {
     if (!this.enabled || this.context?.state !== 'running') return;
     const time = this.context.currentTime + .012;
     switch (type) {
@@ -98,18 +98,33 @@ export class Percussion {
         break;
       case 'parry':
         this.gong(time, true);
+        this.texture(time, 3340, .23, .071);
         break;
-      case 'hurt':
+      case 'hit': {
+        const heavy = strength >= 2;
+        this.tone(time, heavy ? 132 : 180, heavy ? 43 : 77, heavy ? .29 : .17, heavy ? .19 : .10, 'triangle');
+        this.texture(time, heavy ? 980 : 1530, heavy ? .26 : .17, heavy ? .095 : .063);
+        if (heavy) this.texture(time + .007, 3100, .12, .06);
+        break;
+      }
       case 'break':
-        this.tone(time, 144, 73, .13, .13, 'triangle');
-        this.texture(time, 550, .13, .087);
+        this.tone(time, 166, 46, .29, .22, 'triangle');
+        this.texture(time, 2170, .28, .15);
+        this.drum(time + .048, true);
         break;
       case 'block':
-        this.texture(time, 1570, .15, .105);
+        this.tone(time, 573, 493, .087, .10, 'triangle');
+        this.texture(time, 2520, .19 + strength * .025, .083);
         break;
       case 'step':
+      case 'dodge':
+        this.texture(time, type === 'step' ? 530 : 1150, .080, .099);
+        break;
       case 'swing':
-        this.texture(time, type === 'step' ? 550 : 960, .065, .10);
+        this.texture(time, strength ? 1440 : 1190, .077, .079);
+        break;
+      case 'roundEnd':
+        this.drum(time, true);
         break;
       case 'complete':
         this.drum(time, true);
