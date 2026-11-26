@@ -63,12 +63,12 @@
   ],
   "footer": {
     "aboutTitle": "About Whizzzest",
-    "aboutDesc": "The visitor guide to Wanzai, Jiangxi — home of Chinese fireworks: the free Kiss of Flames show every Saturday night, best viewing spots, tour routes, local cuisine and living heritage.",
+    "aboutDesc": "A guide to Wanzai, Jiangxi, with fireworks viewing spots, travel routes, local food and living traditions.",
     "contact": "Contact us",
     "friendLinks": [
       {
         "label": "Wanzai County Government",
-        "href": "http://www.wanzai.gov.cn/"
+        "href": "https://www.wanzai.gov.cn/"
       },
       {
         "label": "Author's homepage",
@@ -131,7 +131,7 @@
   "manifest": {
     "name": "Whizzzest",
     "short_name": "Whizzzest",
-    "description": "Explore a thousand years of fireworks culture, living heritage, local flavors and the scenery of Wanzai — the home of Chinese fireworks in Jiangxi.",
+    "description": "Explore Wanzai, Jiangxi, through its fireworks, living traditions, local food and landscapes.",
     "shortcuts": [
       {
         "name": "Fireworks simulator",

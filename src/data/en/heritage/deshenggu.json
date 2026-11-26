@@ -1,26 +1,26 @@
 {
   "meta": {
     "title": "Desheng Drum — Whizzzest",
-    "description": "The Desheng Drum is Wanzai's traditional folk drum music, born in the Northern Song and drawn from the Tang story of quelling the An Shi Rebellion — thunderous, stirring, and always in step."
+    "description": "Wanzai’s Desheng Drum tradition pairs the suona with drums, gongs and cymbals. China added it to its national intangible cultural heritage list in 2008."
   },
   "hero": {
     "title": "Desheng Drum",
-    "subtitle": "Thunderous drumbeats that sound the boldness and unity of Wanzai",
+    "subtitle": "Suona melodies and percussion tell the story of a victory",
     "img": "deshengu.jpg"
   },
-  "badge": "Wanzai traditional folk drum music",
+  "badge": "National ICH · inscribed 2008",
   "video": "BV1psL86aEJG",
   "videoHint": "Video playback may use significant data — Wi-Fi recommended",
   "paras": [
-    "The Desheng Drum (\"Victory Drum\") is the traditional folk drum music of Wanzai County. Born in the Northern Song and drawing its themes from the Tang-dynasty quelling of the An Shi Rebellion, it is famed for its thunderous, stirring power, its tightly unified rhythms and its richly varied performances.",
-    "A Desheng Drum troupe typically numbers in the dozens, playing large drums, small drums, suona horns, gongs and cymbals. Formations shift as they play and the beats stay bright and brisk — a full display of the bold spirit and solidarity of Wanzai's people.",
-    "Today the Desheng Drum is one of Wanzai's signature cultural brands, performed at festivals and celebrations throughout the county and beloved by locals and visitors alike."
+    "Desheng Drum (literally “Victory Drum”) is a Wanzai folk music tradition that took shape during the Northern Song dynasty. Its nine-part suite follows a Tang dynasty story about the defeat of the An Lushan Rebellion.",
+    "A suona, a loud double-reed wind instrument, leads the ensemble alongside drums, gongs and cymbals. The music moves from brisk, light passages to forceful drumming, and players use the suona to imitate the sound of horses.",
+    "The music is traditionally heard at weddings, festivals and other celebrations. In 2008, China added the Wanzai tradition to its national intangible cultural heritage list under suona music."
   ],
   "prev": { "href": "/en/heritage/fireworks/", "label": "Wanzai fireworks" },
   "next": { "href": "/en/heritage/xiabu/", "label": "Xiabu weaving" },
   "cta": {
     "title": "Experience the heritage",
-    "desc": "Come to Wanzai and experience these living traditions first-hand — a millennium of culture, carried forward and reinvented.",
+    "desc": "Plan a visit to Wanzai to see how these arts are practiced today.",
     "btn": "See tour routes",
     "href": "/en/tourism/"
   }

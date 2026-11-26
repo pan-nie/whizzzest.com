@@ -1,57 +1,57 @@
 {
   "meta": {
     "title": "Heritage — Whizzzest",
-    "description": "Wanzai fireworks craftsmanship, Desheng Drum, Kaikou Nuo, Xiabu weaving, Zhipeng folk songs — discover the intangible cultural heritage of Wanzai, Jiangxi, with videos."
+    "description": "Explore five examples of Wanzai’s intangible cultural heritage, from fireworks craftsmanship to Desheng Drum music and Xiabu weaving."
   },
   "hero": {
     "title": "Living Heritage",
-    "subtitle": "Explore a millennium of cultural heritage in Wanzai",
+    "subtitle": "Five living traditions from Wanzai, Jiangxi",
     "img": "nuowu.jpeg"
   },
-  "itemsTitle": "Heritage items",
-  "itemsDesc": "Five items of intangible cultural heritage at county, provincial and national level — click through for videos and in-depth introductions.",
+  "itemsTitle": "Wanzai’s living traditions",
+  "itemsDesc": "Explore four nationally listed traditions and one recognized by Jiangxi Province. Each guide includes a video.",
   "items": [
     {
       "key": "fireworks",
       "title": "Wanzai fireworks",
       "badge": "National ICH · 2008",
-      "summary": "Renowned worldwide for their crisp reports, high burst rate and fragrance — over 4,000 varieties sell to more than 40 countries and regions."
+      "summary": "A craft with centuries of history in Wanzai, from small firecrackers to elaborate public displays."
     },
     {
       "key": "deshenggu",
       "title": "Desheng Drum",
-      "badge": "Traditional folk drum music",
-      "summary": "A folk drum tradition from the Northern Song era — thunderous, stirring rhythms and ever-changing formations that show the boldness and unity of Wanzai's people."
+      "badge": "National ICH · 2008",
+      "summary": "A folk ensemble tradition combining suona melodies with the rhythms of drums, gongs and cymbals."
     },
     {
       "key": "xiabu",
       "title": "Xiabu weaving",
-      "badge": "National ICH · 2009",
-      "summary": "A 1,600-year-old handcraft weaving ramie grass cloth — light, breathable, and exported across the seas."
+      "badge": "National ICH · 2008",
+      "summary": "A handweaving tradition that turns ramie fiber into a light, breathable summer cloth."
     },
     {
       "key": "kaikounuo",
       "title": "Kaikou Nuo",
       "badge": "National ICH · 2008",
-      "summary": "Also known as \"Tiaoxiao\", a 600-year-old folk ritual where every role sings — a complete tradition of song, dance, speech and combat."
+      "summary": "Wanzai’s masked ritual theater combines singing, speech, movement and stylized combat."
     },
     {
       "key": "zhipeng",
       "title": "Zhipeng folk songs",
-      "badge": "Jiangxi provincial ICH · 2007",
-      "summary": "Work songs created by papermakers over 500 years — beautiful melodies with a rich local flavor."
+      "badge": "Jiangxi provincial ICH",
+      "summary": "The folk songs of bamboo papermakers, shaped by the rhythm of their work in the paper sheds."
     },
     {
       "key": "experience",
       "title": "Heritage experiences",
       "badge": "Coming soon",
-      "summary": "Hands-on heritage workshops are being prepared — stay tuned.",
+      "summary": "See which demonstrations and workshops are being planned.",
       "placeholder": true
     }
   ],
   "cta": {
     "title": "Experience the heritage",
-    "desc": "Come to Wanzai and experience these living traditions first-hand — a millennium of culture, carried forward and reinvented.",
+    "desc": "Plan a visit to Wanzai to see how these arts are practiced today.",
     "btn": "See tour routes",
     "href": "/en/tourism/"
   }

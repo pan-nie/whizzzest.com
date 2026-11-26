@@ -2,7 +2,7 @@
   "_note": "Social hub page /en/social/ copy. Channel SVGs and links are NOT here: the channel table is src/data/social-channels.json and the link source is the footer.socials of both locales' site.json. The live-chat href is resolved across locales from site.footer.onlineSupport (this page only carries its label/desc) — the English page keeps the WeCom live-chat tile so both locales stay symmetric. Resolved at build time by build.js resolveSocialChannels (docs/社媒聚合页方案.md §4).",
   "meta": {
     "title": "Follow Whizzzest — official social media",
-    "description": "Every official Whizzzest channel in one place: Bilibili, WeChat, Douyin, RedNote, X, YouTube, Instagram, Facebook and Discord."
+    "description": "Find Whizzzest on social media, email the team or share the Wanzai guide."
   },
   "socialChannels": true,
   "contactSupport": true,
@@ -12,14 +12,14 @@
   },
   "sections": {
     "channelsTitle": "Official channels",
-    "channelsDesc": "Chinese and global platforms together — pick the one you already use.",
+    "channelsDesc": "Choose the social platform you use.",
     "contactTitle": "Contact & share",
     "emailLabel": "Email",
-    "supportLabel": "Live chat",
-    "supportDesc": "WeCom support — we reply as soon as we can.",
+    "supportLabel": "Chat on WeCom",
+    "supportDesc": "Contact the team through WeCom.",
     "ctaOpen": "Visit ↗",
     "ctaShare": "Open the QR code",
     "shareLabel": "Share this site",
-    "shareDesc": "Send Whizzzest to a friend — long-press to scan in WeChat, or download the QR code."
+    "shareDesc": "Download the QR code or open it in WeChat to share the guide."
   }
 }

@@ -1,11 +1,11 @@
 {
   "meta": {
     "title": "Viewing Spots — Whizzzest",
-    "description": "Wanzai Ancient City and Longhu Park — the best spots and transport tips for watching fireworks. Every Saturday at 8 pm, the Kiss of Flames lights up the sky."
+    "description": "Where to watch fireworks in Wanzai, Jiangxi. Find viewing areas and travel tips for Wanzai Ancient City and Longhu Park."
   },
   "hero": {
     "title": "Fireworks viewing spots",
-    "subtitle": "The best places to watch the fireworks",
+    "subtitle": "Where to watch in Wanzai Ancient City and Longhu Park",
     "img": "viewingspots_hero.jpeg"
   },
   "viewingLabel": "Best viewing spots",
@@ -13,7 +13,7 @@
   "spots": [
     {
       "name": "Wanzai Ancient City",
-      "desc": "Wanzai Ancient City is one of the best places to watch the fireworks: every Saturday at 8:00 pm the free \"Kiss of Flames\" show lights up the sky for 30 minutes. Stone-paved lanes, horse-head gables and brilliant fireworks mirror one another in a picture-perfect scene.",
+      "desc": "Fireworks light up the tiled roofs and stepped gables of Wanzai Ancient City. The regular outdoor show is usually at 8 pm on Saturdays. Check the latest venue announcement before making plans.",
       "viewing": "Lüyin Square, the riverside promenade and the ancient city viewing terrace",
       "transport": "In the heart of Wanzai's county seat — reachable by bus or taxi",
       "img": "guchen_niaokan.jpeg",
@@ -21,7 +21,7 @@
     },
     {
       "name": "Longhu Park",
-      "desc": "Longhu Park is Wanzai's urban park, with a broad lake and open sightlines — an ideal fireworks vantage point. The bursts reflected in the water make for a double visual treat.",
+      "desc": "Longhu Park has open views across the lake, where fireworks are reflected in the water. Check the event notice for dates, approved viewing areas and any ticket requirements.",
       "viewing": "The lakeside boardwalk, the mid-lake pavilion and the lakeside lawns",
       "transport": "In the southwest of the county seat — reachable by bus or taxi",
       "img": "longhu_niaokan.jpeg",
@@ -31,21 +31,21 @@
   "tipsTitle": "Viewing tips",
   "tips": [
     {
-      "title": "Best times to watch",
+      "title": "Check the schedule",
       "items": [
-        "Every Saturday, 8:00–8:30 pm (Wanzai Ancient City fireworks show)",
-        "Major holidays (Spring Festival, Lantern Festival, National Day) and the Wanzai Fireworks Festival",
-        "Summer evenings — cooler air, perfect for the outdoors",
-        "Spring and autumn — mild weather and lovely scenery",
-        "Snowy winter nights — fireworks dancing with falling snow"
+        "The regular Wanzai Ancient City show is usually at 8 pm on Saturdays.",
+        "A separate schedule may apply on public holidays and during the Wanzai Fireworks Festival.",
+        "Check the venue’s latest announcement for the time and any changes.",
+        "If a display is announced for Longhu Park, confirm the park venue on the event notice.",
+        "Allow time to reach the viewing area before the display begins."
       ]
     },
     {
       "title": "Good to know",
       "items": [
-        "Arrive early to claim a good vantage point",
-        "Stay safe: keep clear of launch sites and choose open ground",
-        "Protect the environment — take your litter with you",
+        "Arrive early and use designated public viewing areas.",
+        "Keep clear of launch sites and restricted areas.",
+        "Take your litter with you.",
         "Follow on-site staff instructions",
         "Bring a camera or phone to capture the moment"
       ]
@@ -54,8 +54,8 @@
   "faqTitle": "FAQ",
   "faq": [
     {
-      "q": "When is the Kiss of Flames fireworks show?",
-      "a": "Every Saturday, 8:00–8:30 pm at Wanzai Ancient City, free of charge; extra shows run during major holidays and the Wanzai Fireworks Festival."
+      "q": "When is the Wanzai Ancient City fireworks show?",
+      "a": "The regular show is usually at 8 pm on Saturdays. For holiday programs, delays or cancellations, check the latest venue announcement."
     },
     {
       "q": "Where are the best places to watch?",
@@ -63,20 +63,11 @@
     },
     {
       "q": "Do I need a ticket?",
-      "a": "No — the Kiss of Flames is a free show. Arrive early for a good spot, keep clear of the launch sites and stay safe."
+      "a": "The regular Wanzai Ancient City show is generally free to watch. Separately ticketed events may have different arrangements."
     },
     {
       "q": "How do I get to the Ancient City and Longhu Park?",
-      "a": "Both are inside Wanzai's county seat, reachable by bus or taxi — the Ancient City in the heart of town, Longhu Park in the southwest."
+      "a": "Both venues are in Wanzai’s county seat. You can use a local bus or taxi. Check for temporary traffic restrictions on show days."
     }
-  ],
-  "event": {
-    "name": "Kiss of Flames fireworks show",
-    "description": "A free 30-minute fireworks show at Wanzai Ancient City every Saturday at 8:00 pm.",
-    "locationName": "Wanzai Ancient City",
-    "addressLocality": "Yichun",
-    "addressRegion": "Jiangxi",
-    "startTime": "20:00",
-    "duration": "PT30M"
-  }
+  ]
 }

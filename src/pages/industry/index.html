@@ -51,7 +51,7 @@
       <div class="container">
         <article class="split split-rev reveal">
           <div class="split-media">
-            <img src="/assets/img/{{data.cultureTourism.img}}" alt="{{data.cultureTourism.title}}" loading="lazy" decoding="async" data-sizes="(max-width: 833px) 100vw, 512px" {{#if data.cultureTourism.ar}}style="aspect-ratio:{{data.cultureTourism.ar}}"{{/if}}>
+            <img src="/assets/img/{{data.cultureTourism.img}}" alt="{{#if data.cultureTourism.alt}}{{data.cultureTourism.alt}}{{/if}}{{#unless data.cultureTourism.alt}}{{data.cultureTourism.title}}{{/unless}}" loading="lazy" decoding="async" data-sizes="(max-width: 833px) 100vw, 512px" {{#if data.cultureTourism.ar}}style="aspect-ratio:{{data.cultureTourism.ar}}"{{/if}}>
           </div>
           <div class="split-body">
             <span class="kicker">{{t.industry.kickerTourism}}</span>
@@ -61,7 +61,7 @@
         </article>
         <article class="split reveal">
           <div class="split-media">
-            <img src="/assets/img/{{data.future.img}}" alt="{{data.future.title}}" loading="lazy" decoding="async" data-sizes="(max-width: 833px) 100vw, 512px" {{#if data.future.ar}}style="aspect-ratio:{{data.future.ar}}"{{/if}}>
+            <img src="/assets/img/{{data.future.img}}" alt="{{#if data.future.alt}}{{data.future.alt}}{{/if}}{{#unless data.future.alt}}{{data.future.title}}{{/unless}}" loading="lazy" decoding="async" data-sizes="(max-width: 833px) 100vw, 512px" {{#if data.future.ar}}style="aspect-ratio:{{data.future.ar}}"{{/if}}>
           </div>
           <div class="split-body">
             <span class="kicker">{{t.industry.kickerFuture}}</span>

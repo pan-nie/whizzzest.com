@@ -1,26 +1,26 @@
 {
   "meta": {
     "title": "Xiabu Weaving — Whizzzest",
-    "description": "Wanzai's Xiabu (ramie grass cloth) weaving joined the national intangible cultural heritage list in 2009 — 1,600 years of history, woven from ramie into a light, breathable summer fabric."
+    "description": "Wanzai’s Xiabu weaving turns ramie into a light summer cloth. The craft was added to China’s national intangible cultural heritage list in 2008."
   },
   "hero": {
     "title": "Xiabu weaving",
-    "subtitle": "Sixteen centuries of ramie warp and weft, woven into summer cloth as light as cicada wings",
+    "subtitle": "How Wanzai weavers turn ramie fiber into summer cloth",
     "img": "xiabu.jpg"
   },
-  "badge": "National ICH · inscribed 2009",
+  "badge": "National ICH · inscribed 2008",
   "video": "BV1tLL86BEwB",
   "videoHint": "Video playback may use significant data — Wi-Fi recommended",
   "paras": [
-    "Xiabu weaving is the traditional handcraft of Wanzai County, its production traceable to the late Eastern Jin — some 1,600 years of history. In 2009, Wanzai's Xiabu weaving craftsmanship was inscribed on the third batch of China's national intangible cultural heritage list.",
-    "Wanzai Xiabu — ramie grass cloth — is woven from ramie fiber through four steps: warping, sizing, mounting the loom and weaving. Light and thin, breathable and absorbent, it is the ideal fabric for summer wear.",
-    "Today Wanzai Xiabu is a specialty product of Jiangxi Province, sold far beyond China's borders and prized by customers at home and abroad."
+    "Xiabu is a traditional woven ramie cloth. The craft in Wanzai traces its roots to the late Eastern Jin dynasty. Wanzai and Rongchang were listed together in the second group of China’s national intangible cultural heritage entries in 2008.",
+    "Weavers prepare the ramie threads, size the warp, set up the loom and weave the cloth. The airy fabric absorbs moisture and is traditionally used for summer clothing.",
+    "Xiabu is still made in Jiangxi. The finished fabric can be used in clothing and other textiles."
   ],
   "prev": { "href": "/en/heritage/deshenggu/", "label": "Desheng Drum" },
   "next": { "href": "/en/heritage/kaikounuo/", "label": "Kaikou Nuo" },
   "cta": {
     "title": "Experience the heritage",
-    "desc": "Come to Wanzai and experience these living traditions first-hand — a millennium of culture, carried forward and reinvented.",
+    "desc": "Plan a visit to Wanzai to see how these arts are practiced today.",
     "btn": "See tour routes",
     "href": "/en/tourism/"
   }
