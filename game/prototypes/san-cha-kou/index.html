@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="《三岔口》京剧武戏网页试玩。选一位名角，听锣鼓，在三维戏台上与电脑对阵。">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#171010">
+  <title>三岔口 · 梨园对阵</title>
+  <link rel="icon" href="./models/ren.png" type="image/png">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./main.mjs"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <span class="seal" aria-hidden="true">武</span>
+        <span>梨园对阵</span>
+      </div>
+      <nav aria-label="试玩设置">
+        <button id="pause" class="quiet-button" type="button" hidden>暂停</button>
+        <a class="quiet-button help-link" href="#controls">操作说明</a>
+        <button id="sound" class="quiet-button sound-button" type="button" aria-pressed="true">
+          <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>音效开</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="intro">
+      <div>
+        <p class="kicker"><span aria-hidden="true"></span> 京剧武戏 · 3D 单人试玩</p>
+        <h1>三岔口</h1>
+      </div>
+      <p>在刘家客店登台，听锣鼓，见招拆招。</p>
+    </div>
+
+    <div class="game-grid">
+      <div class="game-column">
+        <section id="arena" class="arena" aria-label="对战场地" data-phase="selection">
+          <div class="stage-curtain" aria-hidden="true"></div>
+          <div class="scoreboard">
+            <div class="score-side player">
+              <div class="fighter-line"><b id="p-name">任堂惠</b><span>你</span></div>
+              <div class="health"><div id="p-health" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="你的体力"></div></div>
+              <div class="meters">
+                <div id="p-focus" class="focus-meter" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-label="你的气势"><i></i><i></i><i></i></div>
+                <div class="stance"><div id="p-stance" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="你的架势"></div></div>
+              </div>
+            </div>
+            <div class="timer-block"><time id="timer" aria-label="剩余秒数">60</time><span id="mode-tag">对阵</span></div>
+            <div class="score-side cpu">
+              <div class="fighter-line"><b id="c-name">刘利华</b><span>电脑</span></div>
+              <div class="health"><div id="c-health" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="电脑体力"></div></div>
+              <div class="meters">
+                <div id="c-focus" class="focus-meter" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-label="电脑气势"><i></i><i></i><i></i></div>
+                <div class="stance"><div id="c-stance" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="电脑架势"></div></div>
+              </div>
+            </div>
+          </div>
+          <div id="loading" class="loading" role="status"><i></i> 正在搭台</div>
+          <div id="cue" class="cue" role="status" hidden>
+            <span id="cue-source"></span><strong id="cue-name"></strong><small id="cue-detail"></small>
+          </div>
+          <div class="stage-tag" aria-hidden="true"><i></i> 刘家客店</div>
+
+          <div id="pause-overlay" class="overlay" hidden>
+            <div class="dialog">
+              <p class="dialog-kicker">对阵暂停</p>
+              <h2>稍歇片刻</h2>
+              <button type="button" id="resume" class="action-button">继续对阵 <span aria-hidden="true">→</span></button>
+              <button type="button" id="quit" class="text-button">返回选角</button>
+            </div>
+          </div>
+
+          <div id="result" class="overlay" hidden>
+            <div class="dialog">
+              <p class="dialog-kicker">本场结果</p>
+              <h2 id="outcome">分出胜负</h2>
+              <p id="result-caption"></p>
+              <button type="button" id="replay" class="action-button">回看关键一招 <span aria-hidden="true">▶</span></button>
+              <button type="button" id="rematch" class="text-button">再打一局</button>
+            </div>
+          </div>
+
+          <div id="replay-controls" class="replay-bar" hidden>
+            <div class="replay-label"><span>慢速回放</span><strong id="replay-title"></strong></div>
+            <div class="replay-transport">
+              <button type="button" id="replay-play" aria-label="暂停回放">Ⅱ</button>
+              <div class="scrubber"><span id="replay-point" aria-hidden="true"></span><input id="scrub" type="range" min="0" max="1000" value="0" aria-label="回放进度"></div>
+              <button type="button" id="replay-close">返回结果</button>
+            </div>
+            <p id="replay-caption"></p>
+          </div>
+        </section>
+
+        <section id="controls" class="keyboard" aria-label="操作说明">
+          <div><kbd>W A S D</kbd><span>走位</span></div>
+          <div><kbd>左键</kbd><span>轻招</span></div>
+          <div><kbd>E</kbd><span>重招</span></div>
+          <div><kbd>右键</kbd><span>格挡</span></div>
+          <div><kbd>Shift</kbd><span>闪步</span></div>
+          <div><kbd>Q</kbd><span>绝技</span></div>
+        </section>
+      </div>
+
+      <aside class="selection-panel" aria-labelledby="select-title">
+        <div class="panel-title"><h2 id="select-title">选择角色</h2></div>
+        <div id="roster" class="roster" role="group" aria-label="选择你的角色">
+          <button class="fighter-card ren" type="button" data-id="ren" aria-pressed="true">
+            <span class="portrait"><img src="./models/ren.png" alt="" width="200" height="220"></span>
+            <span class="fighter-copy"><strong>任堂惠</strong><small>短打武生 · 单刀</small><span>进退均衡，擅长还手</span></span>
+            <span class="chosen-dot" aria-hidden="true"></span>
+          </button>
+          <button class="fighter-card liu" type="button" data-id="liu" aria-pressed="false">
+            <span class="portrait"><img src="./models/liu.png" alt="" width="200" height="220"></span>
+            <span class="fighter-copy"><strong>刘利华</strong><small>武丑 · 短刀</small><span>低身闪步，贴身抢攻</span></span>
+            <span class="chosen-dot" aria-hidden="true"></span>
+          </button>
+          <button class="fighter-card gao" type="button" data-id="gao" aria-pressed="false">
+            <span class="portrait"><img src="./models/gao.png" alt="" width="200" height="220"></span>
+            <span class="fighter-copy"><strong>高宠</strong><small>长靠武生 · 长枪</small><span>长枪控距，重招势大</span></span>
+            <span class="chosen-dot" aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="ready">
+          <div class="matchup"><span>本场对手</span><strong id="opponent">刘利华</strong></div>
+          <button id="start" class="action-button" type="button" disabled>登台对阵 <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="tip">
+          <strong>听起鼓，看落点</strong>
+          <p>金色扇面预告重招的范围，末锣是出手点。命中或精准防守可积攒气势，三格蓄满后用 <kbd>Q</kbd> 发动绝技。</p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <span>左键也可用 <kbd>J</kbd>，右键也可用 <kbd>K</kbd>。对局中按 <kbd>Esc</kbd> 暂停。</span>
+      <span>Blender 原创模型 · 合成锣鼓音效</span>
+    </footer>
+  </main>
+</body>
+</html>

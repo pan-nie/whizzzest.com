@@ -1,0 +1,31 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "whizzzest-opera",
+  "account_id": "67e59aecb10a2a8b4b4d525ff8ddcb56",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "main": "./worker.mjs",
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": [
+      "/", "/index.html",
+      "/game", "/game/", "/game/index.html",
+      "/music", "/music/", "/music/index.html",
+      "/video", "/video/", "/video/index.html",
+      "/api/music", "/media/music/*"
+    ]
+  },
+  "r2_buckets": [
+    { "binding": "OPERA_MUSIC", "bucket_name": "whizzzest-opera-music" }
+  ],
+  "routes": [
+    { "pattern": "opera.whizzzest.com", "custom_domain": true }
+  ]
+}

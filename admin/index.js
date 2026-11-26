@@ -58,6 +58,8 @@ import { createWebAuthn } from '../shared/webauthn.js';
 import { requireHttps } from '../shared/https.mjs';
 import { handleGalleryAdmin } from './gallery.js';
 import { GALLERY_INIT, GALLERY_PANEL } from './gallery-ui.js';
+import { handleOperaMusic } from './opera-music.mjs';
+import { MUSIC_ADMIN_SCRIPT } from './music-ui.js';
 
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 天
 const SESSION_TTL_S = SESSION_TTL_MS / 1000;
@@ -141,6 +143,7 @@ export default {
         "script-src 'unsafe-inline'", // MVP：内联脚本，无外部依赖
         "style-src 'unsafe-inline'",
         "connect-src 'self'",
+        "media-src 'self' blob:",
         "img-src 'self' data: blob: https://whizzzest.com", // 封面缩略图来自主站（/assets /assets-merchant /media 代理）；blob: = 表单里本地图的即时预览
         "object-src 'none'",
         "base-uri 'none'",
@@ -163,6 +166,11 @@ async function handlePage(request, env, path) {
     });
   }
   if (path === '/login') return html(LOGIN_HTML);
+
+  if (path === '/opera-music') {
+    if ((await sessionUid(request, env)) === null) return redirect('/login');
+    return redirect('/#/music/opera');
+  }
 
   if (path === '/') {
     if ((await sessionUid(request, env)) === null) return redirect('/login');
@@ -221,6 +229,10 @@ async function handleApi(request, env, path) {
   }
 
   let m;
+  if (path === '/api/opera-music' || path.startsWith('/api/opera-music/')) {
+    return handleOperaMusic(request, path, env.OPERA_MUSIC, PAGE_SIZE);
+  }
+
   if (path === '/api/me' && method === 'GET') {
     return json({ ok: true, user: await resolveUser(env, uid) });
   }
@@ -2053,6 +2065,8 @@ const BASE_CSS = `
   button.primary:hover { background: #b5371a; color: #fff; }
   .tab { color: #6e6e73; background: transparent; border-color: transparent; }
   .tab.active { color: #1d1d1f; background: #fff; border-color: rgba(0,0,0,.12); font-weight: 600; }
+  .music-libraries .tab { padding: 7px 14px; border: 1px solid transparent; border-radius: 980px; font-size: 13px; text-decoration: none; }
+  .music-libraries .tab:hover, .music-libraries .tab.active { border-color: rgba(0,0,0,.12); }
   .panel {
     max-width: 1060px; margin: 18px auto 0; background: #fff; border-radius: 18px;
     padding: 22px 24px; box-shadow: 0 2px 12px rgba(0,0,0,.04);
@@ -2764,11 +2778,16 @@ ${BASE_CSS}
 </div>
 
 <div id="view-music" class="wrap" style="display:none">
+  <nav class="range music-libraries" aria-label="曲库">
+    <a class="tab active" id="mu-wanzai" href="#/music" aria-current="page">万载音乐</a>
+    <a class="tab" id="mu-opera" href="#/music/opera">梨园剧场音乐</a>
+  </nav>
   <div class="range">
     <button class="tab active" data-must="" type="button">全部</button>
     <button class="tab" data-must="published" type="button">已上线</button>
     <button class="tab" data-must="hidden" type="button">已隐藏</button>
     <span class="updated" id="mustats"></span>
+    <a class="anav-link" id="mu-preview" href="https://whizzzest.com/music/" target="_blank" rel="noopener">打开公开音乐页 ↗</a>
     <button id="muadd" type="button" class="primary">新增曲目</button>
   </div>
   <div class="panel" id="muform" style="display:none">
@@ -2776,6 +2795,7 @@ ${BASE_CSS}
     <div class="mgrid">
       <label>曲名 *<input id="mu-title" maxlength="80"></label>
       <label>演唱 / 演奏<input id="mu-artist" maxlength="40" placeholder="佚名"></label>
+      <label class="wide" id="mu-description-row" style="display:none">简介<textarea id="mu-description" maxlength="500" rows="3"></textarea></label>
       <label>状态
         <select id="mu-status">
           <option value="published">上线</option>
@@ -2784,8 +2804,8 @@ ${BASE_CSS}
       </label>
       <label>曲序（小者靠前）<input id="mu-sort" type="number" value="0"></label>
       <label>时长（秒）<input id="mu-dur" type="number" min="0" max="86400"></label>
-      <label class="wide">音频文件 MP3 *（≤50MB，选文件自动读时长）<input id="mu-file" type="file" accept="audio/mpeg,.mp3"><span class="vfile" id="mu-fileinfo"></span></label>
-      <label class="wide">封面（可选 ≤5MB，方形最佳；不传前台用「焰」字占位）<input id="mu-cover" type="file" accept="image/jpeg,image/png,image/webp"><span class="vfile" id="mu-coverinfo"></span></label>
+      <label class="wide"><span id="mu-file-label">音频文件 MP3 *（≤50MB，选文件自动读时长）</span><input id="mu-file" type="file" accept="audio/mpeg,.mp3"><span class="vfile" id="mu-fileinfo"></span></label>
+      <label class="wide">封面（可选，JPG、PNG、WebP，最多 5 MB）<input id="mu-cover" type="file" accept="image/jpeg,image/png,image/webp"><span class="vfile" id="mu-coverinfo"></span></label>
     </div>
     <div class="vprog" id="mu-prog" style="display:none"><div id="mu-progbar"></div></div>
     <p class="vhint" id="mu-hint" style="margin-top:8px;display:none"></p>
@@ -2980,6 +3000,8 @@ const loadGallery = ${GALLERY_INIT};
 var VIEWS = ['msg', 'visit', 'merch', 'tv', 'books', 'music', 'attra', 'gallery', 'ai', 'acct'];
 var suppressHash = false;
 function showView(v, skipHash) {
+  var operaMusic = v === 'music/opera';
+  if (operaMusic) v = 'music';
   if (VIEWS.indexOf(v) === -1) v = 'msg';
   currentView = v;
   el('view-msg').style.display = v === 'msg' ? '' : 'none';
@@ -3007,14 +3029,15 @@ function showView(v, skipHash) {
   if (v === 'merch') loadMerchants(true);
   if (v === 'tv') loadTv(true);
   if (v === 'books') loadBooks(true);
-  if (v === 'music') loadMusic(true);
+  if (v === 'music') selectMusicLibrary(operaMusic ? 'opera' : 'wanzai');
   if (v === 'attra') loadAttra(true);
   if (v === 'gallery') loadGallery();
   if (v === 'ai') loadAi();
   if (v === 'acct') loadAccounts();
-  if (!skipHash && '#/' + v !== location.hash) {
+  var viewPath = operaMusic ? 'music/opera' : v;
+  if (!skipHash && '#/' + viewPath !== location.hash) {
     suppressHash = true;
-    location.hash = '/' + v;
+    location.hash = '/' + viewPath;
   }
 }
 window.addEventListener('hashchange', function () {
@@ -4002,10 +4025,10 @@ function hint(msg) {
 }
 
 /** File 直作 PUT body 上传（XHR 才有 upload 进度事件）；返回 {ok, key} */
-function putFile(url, file, onP) {
+function putFile(url, file, onP, method) {
   return new Promise(function (resolve, reject) {
     var xhr = new XMLHttpRequest();
-    xhr.open('PUT', url);
+    xhr.open(method || 'PUT', url);
     if (onP) {
       xhr.upload.addEventListener('progress', function (e) {
         if (e.lengthComputable) onP(e.loaded / e.total);
@@ -4014,7 +4037,11 @@ function putFile(url, file, onP) {
     xhr.onload = function () {
       var d = null;
       try { d = JSON.parse(xhr.responseText); } catch (err) { /* 非 JSON 视为失败 */ }
-      if (xhr.status === 200 && d && d.ok) return resolve(d);
+      if (xhr.status >= 200 && xhr.status < 300 && d && d.ok) return resolve(d);
+      if (xhr.status === 401) {
+        location.href = '/login';
+        return reject(new Error('unauthorized'));
+      }
       reject(new Error((d && d.error) || ('HTTP ' + xhr.status)));
     };
     xhr.onerror = function () { reject(new Error('网络错误')); };
@@ -4404,192 +4431,8 @@ el('bsave').addEventListener('click', function () {
 });
 el('bmore').addEventListener('click', function () { bState.offset += ${PAGE_SIZE}; loadBooks(false); });
 
-/* ---------- 万载音乐管理（2026-09-06） ---------- */
-var muState = { status: '', offset: 0 };
-var editingTrackId = null;
-var M_ST = { published: '已上线', hidden: '已隐藏' };
-
-document.querySelectorAll('#view-music .range [data-must]').forEach(function (b) {
-  b.addEventListener('click', function () {
-    muState.status = b.getAttribute('data-must');
-    document.querySelectorAll('#view-music .range [data-must]').forEach(function (x) { x.classList.remove('active'); });
-    b.classList.add('active');
-    loadMusic(true);
-  });
-});
-
-function loadMusic(reset) {
-  if (reset) muState.offset = 0;
-  var q = '?offset=' + muState.offset + (muState.status ? '&status=' + muState.status : '');
-  api('/api/music' + q).then(function (d) {
-    var list = d.tracks || [];
-    var counts = d.byStatus || {};
-    var line = '共 ' + d.total + ' 首 · 已上线 ' + (counts.published || 0) + ' · 已隐藏 ' + (counts.hidden || 0);
-    if (d.storage != null) line += ' · 已用存储 ' + (d.storage / 1048576).toFixed(1) + ' MB';
-    el('mustats').textContent = line;
-    var box = el('mulist');
-    if (reset) box.innerHTML = '';
-    if (reset && list.length === 0) {
-      box.innerHTML = '<p class="empty">还没有曲目，点右上「新增曲目」上传第一首 MP3。</p>';
-    } else {
-      list.forEach(function (x) { box.appendChild(renderTrack(x)); });
-    }
-    el('mumore').style.display = (muState.offset + ${PAGE_SIZE} < d.total && list.length > 0) ? 'block' : 'none';
-  }).catch(function (e) {
-    if (e.message !== 'unauthorized') el('mulist').innerHTML = '<p class="empty">加载失败：' + esc(e.message) + '</p>';
-  });
-}
-
-function renderTrack(x) {
-  var div = document.createElement('div');
-  div.className = 'msg' + (x.status === 'published' ? '' : ' read');
-  var thumb = coverUrl(x.cover)
-    ? '<img class="vthumb" loading="lazy" alt="" src="' + esc(coverUrl(x.cover)) + '">'
-    : '<div class="vthumb"></div>';
-  var badges =
-    '<span class="k-badge">曲序 ' + (x.sort || 0) + '</span>' +
-    '<span class="mst ' + (x.status === 'published' ? 'mst-approved' : 'mst-rejected') + '">' + (M_ST[x.status] || x.status) + '</span>';
-  div.innerHTML =
-    '<div class="vrow1">' + thumb +
-    '<div style="min-width:0;flex:1">' +
-      '<div class="row1"><span class="name">' + esc(x.title) + '</span>' + badges +
-      (x.status === 'published' ? '<a class="mslug" href="' + SITE_HOME + '/music/" target="_blank" rel="noopener">前台收听 ↗</a>' : '') +
-      '</div>' +
-      '<div class="meta">' + (x.artist ? esc(x.artist) + ' · ' : '') + (vDur(x.duration) ? '时长 ' + vDur(x.duration) + ' · ' : '') + '播放 ' + (x.plays || 0) + ' 次 · ' + esc(fmtTime(x.created_at)) + '</div>' +
-    '</div></div>' +
-    '<div class="ops">' +
-    '<button type="button" data-act="toggle">' + (x.status === 'published' ? '隐藏' : '上线') + '</button>' +
-    '<button type="button" data-act="edit">编辑</button>' +
-    '<button type="button" data-act="del">删除</button></div>';
-  div.querySelector('.ops').addEventListener('click', function (e) {
-    var act = e.target.getAttribute('data-act');
-    if (act === 'toggle') {
-      api('/api/music/' + x.id, {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ status: x.status === 'published' ? 'hidden' : 'published' })
-      }).then(function () { loadMusic(true); });
-    } else if (act === 'edit') {
-      openTrackForm(x);
-    } else if (act === 'del') {
-      // 二次点击确认（同视频删除）：首击变红待确认，4 秒未点自动复原；第二击删除（音频/封面一并清理，不可恢复）
-      var btn = e.target;
-      if (btn.getAttribute('data-armed') !== '1') {
-        btn.setAttribute('data-armed', '1');
-        btn.className = 'danger';
-        btn.textContent = '确认删除（含音频）';
-        setTimeout(function () {
-          if (!btn.isConnected) return;
-          btn.removeAttribute('data-armed');
-          btn.className = '';
-          btn.textContent = '删除';
-        }, 4000);
-        return;
-      }
-      api('/api/music/' + x.id, { method: 'DELETE' }).then(function () { loadMusic(true); });
-    }
-  });
-  return div;
-}
-
-function openTrackForm(x) {
-  editingTrackId = x ? x.id : null;
-  el('muform-title').textContent = x ? '编辑曲目 #' + x.id : '新增曲目';
-  el('mu-title').value = x ? x.title || '' : '';
-  el('mu-artist').value = x ? x.artist || '' : '';
-  el('mu-status').value = x ? x.status || 'published' : 'published';
-  el('mu-sort').value = x ? x.sort || 0 : 0;
-  el('mu-dur').value = x && x.duration ? x.duration : '';
-  el('mu-file').value = '';
-  el('mu-fileinfo').textContent = x && x.file_key ? '当前音频：' + x.file_key + '（不换文件则留空）' : '';
-  el('mu-cover').value = '';
-  el('mu-coverinfo').textContent = x && x.cover ? '当前封面：' + x.cover : '';
-  muProgress(null); muHint(null);
-  el('muform').style.display = '';
-  el('muform').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function closeTrackForm() { el('muform').style.display = 'none'; editingTrackId = null; muProgress(null); }
-
-function muProgress(p) {
-  var bar = el('mu-prog');
-  if (p == null) { bar.style.display = 'none'; el('mu-progbar').style.width = '0'; return; }
-  bar.style.display = '';
-  el('mu-progbar').style.width = Math.round(p * 100) + '%';
-}
-function muHint(msg) {
-  var h = el('mu-hint');
-  h.textContent = msg || '';
-  h.style.display = msg ? '' : 'none';
-}
-
-// 选文件即预读时长（Audio 元数据）+ 大小提示（50MB 上限）
-el('mu-file').addEventListener('change', function () {
-  var f = this.files && this.files[0];
-  var info = el('mu-fileinfo');
-  if (!f) { info.textContent = ''; return; }
-  info.textContent = f.name + ' · ' + (f.size / 1048576).toFixed(1) + ' MB' + (f.size > 50 * 1048576 ? '（超 50MB，请先压缩）' : '');
-  var a = document.createElement('audio');
-  a.preload = 'metadata';
-  a.onloadedmetadata = function () {
-    if (a.duration && isFinite(a.duration)) el('mu-dur').value = Math.round(a.duration);
-    URL.revokeObjectURL(a.src);
-  };
-  a.src = URL.createObjectURL(f);
-});
-
-el('muadd').addEventListener('click', function () { openTrackForm(null); });
-el('mucancel').addEventListener('click', closeTrackForm);
-el('musave').addEventListener('click', function () {
-  var payload = {
-    title: val('mu-title'), artist: val('mu-artist'), status: val('mu-status'),
-    sort: Number(val('mu-sort') || 0),
-    duration: el('mu-dur').value ? Number(el('mu-dur').value) : 0
-  };
-  if (!payload.title) { alert('请填写曲名'); return; }
-  var file = el('mu-file').files && el('mu-file').files[0];
-  var cover = el('mu-cover').files && el('mu-cover').files[0];
-  if (!editingTrackId && !file) { alert('请选择要上传的 MP3 文件'); return; }
-  if (file) {
-    if (file.size > 50 * 1048576) { alert('音频超过 50MB，请先压缩。'); return; }
-    var ext = (file.name.split('.').pop() || '').toLowerCase();
-    if (ext !== 'mp3') { alert('仅支持 MP3 格式。'); return; }
-  }
-  if (cover && cover.size > 5 * 1048576) { alert('封面图超过 5MB。'); return; }
-
-  var btn = el('musave');
-  btn.disabled = true;
-  var seq = Promise.resolve();
-  if (file) {
-    muProgress(0);
-    muHint('音频上传中，请勿关闭页面…');
-    seq = seq.then(function () {
-      return putFile('/api/music/upload', file, function (p) { muProgress(p); });
-    }).then(function (d) { payload.file_key = d.key; });
-  }
-  if (cover) {
-    seq = seq.then(function () {
-      muHint('封面上传中…');
-      return putFile('/api/music/cover', cover);
-    }).then(function (d) { payload.cover = d.key; });
-  }
-  seq.then(function () {
-    muHint('保存中…');
-    return api(editingTrackId ? '/api/music/' + editingTrackId : '/api/music', {
-      method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-  }).then(function () {
-    closeTrackForm();
-    loadMusic(true);
-  }).catch(function (e) {
-    if (e.message !== 'unauthorized') alert('保存失败：' + e.message);
-  }).then(function () {
-    btn.disabled = false;
-    muProgress(null);
-    muHint(null);
-  });
-});
-el('mumore').addEventListener('click', function () { muState.offset += ${PAGE_SIZE}; loadMusic(false); });
+const MUSIC_PAGE_SIZE = ${PAGE_SIZE};
+${MUSIC_ADMIN_SCRIPT}
 
 /* ---------- 旅游景点管理（2026-09-06） ---------- */
 var aState = { status: '', offset: 0 };
