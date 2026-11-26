@@ -24,4 +24,4 @@ blender --background --factory-startup --python game/prototypes/san-cha-kou/art/
 
 素材参考国家京剧院的《三岔口》剧目资料和国家大剧院的京剧武生讲堂。场景、人物、肖像和音效在此原型制作。玩法、招式判定和鼓点属于游戏改编。
 
-`vendor/three-gltf.mjs` 是 Three.js 0.181.2 的浏览器打包版，包含 GLTFLoader 和 BufferGeometryUtils 的 mergeGeometries。许可证在 `vendor/LICENSE-Three.txt`。
+`vendor/three-gltf.mjs` 是 Three.js 0.181.2 的浏览器打包版，包含 GLTFLoader 和 BufferGeometryUtils 的 mergeGeometries。此打包版用 Web Crypto 生成 UUID 的随机字节。许可证在 `vendor/LICENSE-Three.txt`。
