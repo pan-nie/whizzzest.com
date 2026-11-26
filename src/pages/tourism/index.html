@@ -24,7 +24,7 @@
         <div class="grid" style="gap: 48px;">
           {{#each data.routes as route}}
           <article class="route-card reveal">
-            <img class="route-media" src="/assets/img/{{route.img}}" alt="{{route.name}}" loading="lazy" decoding="async" {{#if route.ar}}style="aspect-ratio:{{route.ar}}"{{/if}}>
+            <img class="route-media" src="/assets/img/{{route.img}}" alt="{{#if route.alt}}{{route.alt}}{{/if}}{{#unless route.alt}}{{route.name}}{{/unless}}" loading="lazy" decoding="async" {{#if route.ar}}style="aspect-ratio:{{route.ar}}"{{/if}}>
             <div class="route-body">
               <h3>{{route.name}}</h3>
               <p class="route-desc">{{route.description}}</p>

@@ -1,37 +1,37 @@
 {
   "meta": {
     "title": "Heritage Experiences — Whizzzest",
-    "description": "Hands-on Wanzai heritage experiences — fireworks making, Nuo mask painting, Xiabu weaving and Desheng Drum workshops — are being prepared. Stay tuned."
+    "description": "See the demonstrations and workshops being planned around Wanzai’s fireworks craft, Nuo masks, Xiabu weaving and Desheng Drum music."
   },
   "hero": {
     "title": "Heritage experiences",
-    "subtitle": "Touch Wanzai's living heritage with your own hands (in preparation — stay tuned)",
+    "subtitle": "Demonstrations and workshops are in development",
     "img": "feiyiexperience.jpg"
   },
   "plansTitle": "Experiences in the works",
-  "plansDesc": "We are preparing hands-on workshops with local heritage bearers. A first look at what's coming:",
+  "plansDesc": "Here are the activities planned with local practitioners. Check back for dates and booking details.",
   "plans": [
     {
-      "name": "Fireworks making workshop",
-      "desc": "Step into a fireworks workshop and, under a bearer's guidance, learn the traditional steps — rolling tubes, packing powder, inserting fuses — and witness the birth of a firework."
+      "name": "Fireworks craft demonstration",
+      "desc": "Meet a local practitioner and learn how the craft developed in Wanzai."
     },
     {
       "name": "Kaikou Nuo mask painting",
-      "desc": "Pick a blank Nuo mask, paint it with a master, and take home the ancient patterns that ward off evil and invite blessing."
+      "desc": "Explore the motifs on Nuo masks and paint a mask with a local practitioner."
     },
     {
       "name": "Xiabu weaving demonstration",
-      "desc": "Sit at an old loom, feel the sizing and the shuttle, and watch ramie become gossamer grass cloth, thread by thread."
+      "desc": "Watch a weaver work at a handloom and see how ramie threads become cloth."
     },
     {
       "name": "Desheng Drum session",
-      "desc": "Learn a passage of Desheng Drum beats with the troupe and feel the bold spirit of Wanzai in the thunderous rhythm."
+      "desc": "Listen to the ensemble and learn a short rhythm with the players."
     }
   ],
   "prev": { "href": "/en/heritage/zhipeng/", "label": "Zhipeng folk songs" },
   "cta": {
     "title": "Explore Wanzai meanwhile",
-    "desc": "While the workshops are in preparation, follow our tour routes to the birthplaces of these traditions and taste Wanzai at its source.",
+    "desc": "While the workshops are in development, explore the places and traditions featured in our itineraries.",
     "btn": "See tour routes",
     "href": "/en/tourism/"
   }

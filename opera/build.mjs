@@ -9,7 +9,7 @@ await rm(output, { recursive: true, force: true });
 await cp(site, output, { recursive: true });
 await mkdir(gameOutput);
 
-const assets = ['audio.mjs', 'combat.mjs', 'main.mjs', 'stage.mjs', 'style.css', 'models', 'vendor'];
+const assets = ['audio.mjs', 'combat.mjs', 'impact.mjs', 'main.mjs', 'stage.mjs', 'style.css', 'models', 'vendor'];
 await Promise.all(assets.map(name => cp(new URL(name, game), new URL(name, gameOutput), { recursive: true })));
 
 const index = await readFile(new URL('index.html', game), 'utf8');

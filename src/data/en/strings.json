@@ -18,9 +18,9 @@
     "lightboxLabel": "QR code viewer",
     "close": "Close",
     "qrAlt": "QR code",
-    "shareHint": "In WeChat, long-press to scan or save the image; other browsers can download it",
-    "shareDownload": "Download QR",
-    "shareShuffle": "Shuffle",
+    "shareHint": "In WeChat, press and hold to scan or save the image. In other browsers, use the download button.",
+    "shareDownload": "Download QR code",
+    "shareShuffle": "Next design",
     "shareDlName": "whizzzest-QR.jpg"
   },
   "common": {
@@ -36,14 +36,14 @@
   },
   "home": {
     "attractKicker": "Attractions · Wanzai scenery",
-    "attractTitle": "Explore Wanzai — ancient town, rivers and fireworks",
+    "attractTitle": "Explore Wanzai’s old town, rivers and parks",
     "attractMore": "All attractions ›",
     "tvKicker": "Whizzzest Streaming · Whizzzest World",
-    "tvTitle": "Start your Wanzai story with an episode",
-    "tvMore": "Enter the channel ›",
+    "tvTitle": "Watch stories and performances from Wanzai",
+    "tvMore": "Browse videos ›",
     "musicKicker": "Whizzzest Music · Whizzzest World",
-    "musicTitle": "Every sound of Wanzai lives here",
-    "musicMore": "Enter the music hall ›"
+    "musicTitle": "Listen to music from Wanzai",
+    "musicMore": "Browse music ›"
   },
   "heritage": {
     "crumb": "← Heritage",
@@ -55,7 +55,7 @@
     "kickerFuture": "04 · Future"
   },
   "about": {
-    "qrBtnTitle": "Click to view the WeChat QR code"
+    "qrBtnTitle": "Open the WeChat QR code"
   },
   "form": {
     "name": "Name",
@@ -67,8 +67,8 @@
     "send": "Send message"
   },
   "notfound": {
-    "body": "The fireworks on this page have all faded.",
-    "home": "Back to home"
+    "body": "We couldn’t find the page you were looking for.",
+    "home": "Back to the homepage"
   },
   "fw": {
     "loading": "Loading",
@@ -96,13 +96,13 @@
     "fullscreen": "Fullscreen",
     "longExposure": "Long exposure",
     "close": "Close",
-    "noscript": "Digital fireworks need JavaScript to bloom. Please enable JavaScript in your browser and try again."
+    "noscript": "Enable JavaScript in your browser to use the fireworks simulator."
   },
   "offline": {
     "title": "Offline · Whizzzest",
     "h1": "You are offline",
-    "p": "No cached copy of this page was found. Pages you have visited, music you have played and the digital fireworks still work offline; everything catches up once you are back online.",
-    "retry": "Reconnect"
+    "p": "This page isn’t available offline. Some pages you’ve already visited may still open. Reconnect to try this page again.",
+    "retry": "Try again"
   },
   "js": {
     "a11y": {

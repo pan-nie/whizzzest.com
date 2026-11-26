@@ -1,101 +1,105 @@
 {
   "meta": {
     "title": "Tour Routes — Whizzzest",
-    "description": "Ancient City cultural route, mountain-and-water route, red culture route — Wanzai Ancient City, Zhushan Cave and the Jiulong primeval forest, stop by stop."
+    "description": "Three suggested Wanzai itineraries covering the old town, mountain and river scenery, and local revolutionary history.",
+    "ogImage": "/assets/img/guchen_niaokan.jpeg"
   },
   "hero": {
     "title": "Tour routes",
-    "subtitle": "Hand-picked itineraries in Wanzai",
-    "img": "wanzai_travelling.jpeg"
+    "subtitle": "Three ways to explore Wanzai",
+    "img": "guchen_xuejing.jpg"
   },
   "routesTitle": "Itineraries",
   "routes": [
     {
       "name": "Ancient City Cultural Tour",
       "nameEn": "Ancient City Cultural Tour",
-      "description": "Morning: Wanzai Ancient City → Noon: lunch at Wanzai Kitchen → Afternoon: Xiabu weaving and Desheng Drum → Evening: the Kiss of Flames fireworks show",
-      "img": "guc_wenhua_tra.jpg",
+      "description": "Start in Wanzai Ancient City, try local dishes for lunch and make time for Xiabu weaving or Desheng Drum music. End the day with fireworks if a show is scheduled.",
+      "img": "guchen_niaokan.jpeg",
+      "alt": "Aerial view of the tiled rooftops of Wanzai Ancient City",
       "stops": [
         {
           "order": 1,
           "name": "Wanzai Ancient City",
-          "desc": "Tour the ancient ancestral halls and the history & culture museum"
+          "desc": "Visit the ancestral halls and local history museum."
         },
         {
           "order": 2,
           "name": "Wanzai Kitchen",
-          "desc": "Taste Wanzai's signature dishes"
+          "desc": "Try Wanzai’s signature banquet dishes."
         },
         {
           "order": 3,
           "name": "Xiabu weaving experience",
-          "desc": "Try the ramie grass cloth craft yourself"
+          "desc": "Learn how ramie cloth is woven. Check whether a demonstration or workshop is available."
         },
         {
           "order": 4,
-          "name": "Kiss of Flames fireworks show",
-          "desc": "Watch the fireworks over the ancient city"
+          "name": "Wanzai Ancient City fireworks",
+          "desc": "Check the evening schedule before heading to the viewing area."
         }
       ],
-      "ar": "1600/872"
+      "ar": "1600/897"
     },
     {
-      "name": "Mountain & Water Cultural Tour",
-      "nameEn": "Mountain & Water Cultural Tour",
-      "description": "Morning: Zhushan Cave and Henghui Art Agriculture → Noon: farm-to-table lunch → Afternoon: rafting on the Jiulong primeval forest → Evening: fireworks at Longhu Park",
-      "img": "shans_wenhua_tra.jpeg",
+      "name": "Mountains, Caves and Rivers",
+      "nameEn": "Mountains, Caves and Rivers",
+      "description": "Visit Zhushan Cave and Henghui Art Agriculture Park in the morning. After lunch, explore Jiulong Forest Park or look for an evening event at Longhu Park.",
+      "img": "longhu_niaokan.jpeg",
+      "alt": "Paths and buildings around the lake in Longhu Park",
       "stops": [
         {
           "order": 1,
           "name": "Zhushan Cave",
-          "desc": "Marvel at the karst caverns"
+          "desc": "Explore the karst caves."
         },
         {
           "order": 2,
-          "name": "Henghui Art Agriculture",
-          "desc": "Tour the art-farm scenery"
+          "name": "Henghui Art Agriculture Park",
+          "desc": "Walk through the landscaped farm park."
         },
         {
           "order": 3,
-          "name": "Jiulong primeval forest",
-          "desc": "Whitewater rafting in the forest"
+          "name": "Jiulong Forest Park",
+          "desc": "Explore the forest and check whether rafting is operating."
         },
         {
           "order": 4,
           "name": "Longhu Park",
-          "desc": "Catch the fireworks festival"
+          "desc": "Walk by the lake or watch a display if one is scheduled."
         }
       ],
       "ar": "1600/898"
     },
     {
-      "name": "Red Culture Tour",
-      "nameEn": "Red Culture Tour",
-      "description": "Morning: revolutionary memorial halls → Noon: Red Army meal → Afternoon: Xianyuan revolutionary sites → Evening: heritage performances and fireworks",
-      "img": "hongs_wenhua_tra.jpg",
+      "name": "Revolutionary History Tour",
+      "nameEn": "Revolutionary History Tour",
+      "description": "Start at the memorial halls and follow the local revolutionary history trail in Xianyuan. If available, try a meal inspired by the Red Army period. Return to Wanzai Ancient City in the evening.",
+      "img": "xianyuanyanxue.jpg",
+      "alt": "A group gathers in front of a memorial in Xianyuan",
       "stops": [
         {
           "order": 1,
           "name": "Hunan-Hubei-Jiangxi Revolutionary Memorial Hall",
-          "desc": "Visit the revolutionary memorial hall"
+          "desc": "Learn about the revolutionary base that spanned Hunan, Hubei and Jiangxi."
         },
         {
           "order": 2,
           "name": "Martyrs' Memorial Hall",
-          "desc": "Pay respects to the revolutionary martyrs"
+          "desc": "Visit the memorial to those who died in the conflict."
         },
         {
           "order": 3,
           "name": "Xianyuan revolutionary base sites",
-          "desc": "Walk the Red Army trail"
+          "desc": "Follow the trail through the former revolutionary base."
         },
         {
           "order": 4,
           "name": "Wanzai Ancient City",
-          "desc": "Heritage performances and the fireworks show"
+          "desc": "Check what heritage performances or fireworks are scheduled."
         }
       ],
-      "ar": "1600/892"
+      "ar": "1080/721"
     }
   ]
 }

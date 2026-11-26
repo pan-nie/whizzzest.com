@@ -20,7 +20,6 @@
       </div>
       <nav aria-label="试玩设置">
         <button id="pause" class="quiet-button" type="button" hidden>暂停</button>
-        <a class="quiet-button help-link" href="#controls">操作说明</a>
         <button id="sound" class="quiet-button sound-button" type="button" aria-pressed="true">
           <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
           <span>音效开</span>
@@ -45,7 +44,7 @@
           <div class="scoreboard">
             <div class="score-side player">
               <div class="fighter-line"><b id="p-name">任堂惠</b><span>你</span></div>
-              <div class="health"><div id="p-health" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="你的体力"></div></div>
+              <div class="health"><span class="health-trail" aria-hidden="true"></span><div id="p-health" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="你的体力"></div></div>
               <div class="meters">
                 <div id="p-focus" class="focus-meter" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-label="你的气势"><i></i><i></i><i></i></div>
                 <div class="stance"><div id="p-stance" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="你的架势"></div></div>
@@ -54,7 +53,7 @@
             <div class="timer-block"><time id="timer" aria-label="剩余秒数">60</time><span id="mode-tag">对阵</span></div>
             <div class="score-side cpu">
               <div class="fighter-line"><b id="c-name">刘利华</b><span>电脑</span></div>
-              <div class="health"><div id="c-health" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="电脑体力"></div></div>
+              <div class="health"><span class="health-trail" aria-hidden="true"></span><div id="c-health" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="电脑体力"></div></div>
               <div class="meters">
                 <div id="c-focus" class="focus-meter" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-label="电脑气势"><i></i><i></i><i></i></div>
                 <div class="stance"><div id="c-stance" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="电脑架势"></div></div>
@@ -65,6 +64,7 @@
           <div id="cue" class="cue" role="status" hidden>
             <span id="cue-source"></span><strong id="cue-name"></strong><small id="cue-detail"></small>
           </div>
+          <div id="combo" class="combo" role="status" hidden></div>
           <div class="stage-tag" aria-hidden="true"><i></i> 刘家客店</div>
 
           <div id="pause-overlay" class="overlay" hidden>
@@ -98,7 +98,7 @@
         </section>
 
         <section id="controls" class="keyboard" aria-label="操作说明">
-          <div><kbd>W A S D</kbd><span>走位</span></div>
+          <div><kbd>A D</kbd><span>左右</span><kbd>W S</kbd><span>前后</span></div>
           <div><kbd>左键</kbd><span>轻招</span></div>
           <div><kbd>E</kbd><span>重招</span></div>
           <div><kbd>右键</kbd><span>格挡</span></div>
@@ -131,8 +131,8 @@
           <button id="start" class="action-button" type="button" disabled>登台对阵 <span aria-hidden="true">→</span></button>
         </div>
         <div class="tip">
-          <strong>听起鼓，看落点</strong>
-          <p>金色扇面预告重招的范围，末锣是出手点。命中或精准防守可积攒气势，三格蓄满后用 <kbd>Q</kbd> 发动绝技。</p>
+          <strong>听起鼓，接连招</strong>
+          <p>轻招打中后再按一次轻招，可接第二击。末锣响时重招出手，可在命中前格挡或用方向键配 <kbd>Shift</kbd> 闪步。攒满三格气势后按 <kbd>Q</kbd>。</p>
         </div>
       </aside>
     </div>

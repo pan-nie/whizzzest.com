@@ -1,26 +1,26 @@
 {
   "meta": {
     "title": "Kaikou Nuo — Whizzzest",
-    "description": "Wanzai's Kaikou Nuo, known as \"Tiaoxiao\", joined the national intangible cultural heritage list in 2008 — a 600-year-old folk ritual where every role sings."
+    "description": "Kaikou Nuo is Wanzai’s masked ritual theater. Its characters sing and speak, and it was listed as national intangible cultural heritage in 2008."
   },
   "hero": {
     "title": "Kaikou Nuo",
-    "subtitle": "The \"Tiaoxiao\" dance where every role sings — six centuries of blessing in a village ritual",
+    "subtitle": "A village ritual in which masked characters sing and speak",
     "img": "kaikounuo.jpeg"
   },
   "badge": "National ICH · inscribed 2008",
   "video": "BV127L86TE24",
   "videoHint": "Video playback may use significant data — Wi-Fi recommended",
   "paras": [
-    "Wanzai's Kaikou Nuo (open-faced Nuo), also known as \"Tiaoxiao\", is a distinctive folk ritual for driving off evil, praying for peace and entertaining gods and people alike. Born at the end of the Yuan and start of the Ming, it has some 600 years of history.",
-    "Kaikou Nuo differs from other Nuo dance forms in that every role must sing — song, movement, declamation and acrobatics in full, though singing leads, with percussion carrying the music throughout and a rustic, earthy air preserved intact.",
-    "In June 2008, \"Wanzai Kaikou Nuo\" was inscribed on the second batch of China's national intangible cultural heritage list."
+    "Kaikou Nuo is a form of masked ritual theater practiced in Wanzai. Also known locally as Tiaoxiao, it was performed to ward off misfortune and pray for peace. The tradition is traced to the transition from the Yuan to the Ming dynasty.",
+    "Kaikou means “open mouth,” referring to the performers’ singing and speech. The repertoire brings together singing, spoken lines, stylized movement and stage combat, with percussion accompanying the performers.",
+    "In June 2008, Wanzai’s Kaikou Nuo was added to China’s national intangible cultural heritage list under Nuo theater."
   ],
   "prev": { "href": "/en/heritage/xiabu/", "label": "Xiabu weaving" },
   "next": { "href": "/en/heritage/zhipeng/", "label": "Zhipeng folk songs" },
   "cta": {
     "title": "Experience the heritage",
-    "desc": "Come to Wanzai and experience these living traditions first-hand — a millennium of culture, carried forward and reinvented.",
+    "desc": "Plan a visit to Wanzai to see how these arts are practiced today.",
     "btn": "See tour routes",
     "href": "/en/tourism/"
   }
