@@ -303,6 +303,29 @@ CREATE TABLE IF NOT EXISTS activity_notice_history (
   PRIMARY KEY (notice_id, revision)
 );
 
+-- 公告采集待审队列和轮询状态（迁移 011）。正文仅参与内存中的变更指纹计算。
+CREATE TABLE IF NOT EXISTS activity_notice_inbox (
+  source_url TEXT PRIMARY KEY NOT NULL,
+  source_title TEXT NOT NULL,
+  source_name TEXT NOT NULL,
+  source_date TEXT NOT NULL,
+  fingerprint TEXT NOT NULL,
+  handled_fingerprint TEXT,
+  notice_id TEXT REFERENCES activity_notices(id),
+  is_change INTEGER NOT NULL CHECK (is_change IN (0, 1)),
+  detected_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_activity_notice_inbox_pending
+  ON activity_notice_inbox(detected_at DESC, source_url) WHERE handled_fingerprint IS NOT fingerprint;
+CREATE INDEX IF NOT EXISTS idx_activity_notice_inbox_fingerprint ON activity_notice_inbox(fingerprint);
+CREATE TABLE IF NOT EXISTS activity_notice_collection (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  checked_at INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('ok', 'partial', 'failed')),
+  changed INTEGER NOT NULL,
+  failed INTEGER NOT NULL
+);
+
 -- 作者账号（writer.whizzzest.com，docs/文库方案.md）：与商户门户完全独立的账号体系，
 -- 同手机号/邮箱可在两边各注册（不同表不同会话密钥）；登录方式与商户一致
 -- 2026-09-06 二次迁移：phone 允许 NULL（支持纯邮箱注册），部分唯一索引仅约束非空手机号

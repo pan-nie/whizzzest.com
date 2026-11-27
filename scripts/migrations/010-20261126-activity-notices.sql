@@ -2,7 +2,7 @@
 -- 生产：npx wrangler d1 execute whizzzest --remote --file scripts/migrations/010-20261126-activity-notices.sql
 -- 本地：npx wrangler d1 execute whizzzest --local --file scripts/migrations/010-20261126-activity-notices.sql
 -- 主站和后台须指向同一个本地 D1。
--- 执行记录：2026-11-26 隔离本地 D1 已执行，生产尚未执行。
+-- 执行记录：2026-11-26 隔离本地 D1 已执行，2026-11-27 生产已核验。
 
 CREATE TABLE IF NOT EXISTS activity_notices (
   id TEXT PRIMARY KEY NOT NULL,
