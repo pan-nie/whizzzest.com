@@ -1305,13 +1305,16 @@ a.feature-card:hover {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.55) 100%);
 }
 
-.hero-arrow {
+.hero-arrow,
+.hero-dots {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 14px;
   z-index: 5;
-  width: 40px;
-  height: 40px;
+}
+
+.hero-arrow {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1335,19 +1338,17 @@ a.feature-card:hover {
 .hero-arrow-next { right: 16px; }
 
 .hero-dots {
-  position: absolute;
-  bottom: 18px;
-  left: 0;
-  right: 0;
-  z-index: 5;
+  /* Limit the hit area to the indicators so it cannot cover the side arrows. */
+  inset-inline: 0;
+  width: max-content;
+  margin-inline: auto;
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .hero-dot {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1375,7 +1376,8 @@ a.feature-card:hover {
 /* ---------------- 首页首屏与出游入口 ---------------- */
 
 .home-hero {
-  min-height: clamp(440px, 54svh, 520px);
+  min-height: clamp(480px, 66vh, 720px);
+  min-height: clamp(480px, 66svh, 720px);
   background: #211216;
   text-align: left;
 }
@@ -1421,12 +1423,6 @@ a.feature-card:hover {
 
 .home-hero-secondary:hover {
   background: rgba(23, 12, 16, 0.72);
-}
-
-.home-hero .hero-arrow {
-  top: auto;
-  bottom: 14px;
-  transform: none;
 }
 
 .home-hero:not(.has-carousel) :is(.hero-arrow, .hero-dots) {
@@ -1563,8 +1559,11 @@ a.feature-card:hover {
 .home-explore .theme-body { padding: 16px 19px 19px; }
 
 @media (max-width: 760px) {
-  .home-hero { min-height: clamp(300px, 41svh, 360px); }
-  .home-hero .hero-content { padding-block: 32px 51px; }
+  .home-hero {
+    min-height: clamp(340px, 47vh, 430px);
+    min-height: clamp(340px, 47svh, 430px);
+  }
+  .home-hero .hero-content { padding-block: 32px 58px; }
   .home-hero .hero-overlay {
     background: linear-gradient(90deg, rgba(18, 10, 15, 0.75), rgba(18, 10, 15, 0.38)),
       linear-gradient(0deg, rgba(18, 10, 15, 0.52), transparent 55%);
@@ -1572,8 +1571,7 @@ a.feature-card:hover {
   .home-hero h1 { font-size: clamp(27px, 8.7vw, 45px); }
   .home-hero .hero-sub { margin-top: 12px; }
   .home-hero .home-hero-actions { margin-top: 18px; }
-  .home-hero .hero-arrow { display: none; }
-  .home-hero .hero-dots { bottom: 8px; }
+  .home-hero :is(.hero-arrow, .hero-dots) { bottom: 8px; }
   .home-visit { padding-block: 15px 20px; }
   .home-visit-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; padding-inline: 16px; }
   .home-visit-panel { padding: 14px 15px 15px; border-radius: 12px; }
