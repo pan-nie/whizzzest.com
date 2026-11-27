@@ -1,7 +1,7 @@
 -- 公告采集待审队列与最近一次执行状态。每日任务只写采集表。
 -- npx wrangler d1 execute whizzzest --remote --file scripts/migrations/011-20261127-activity-notice-collection.sql
 -- 本地演练使用相同命令的 --local 选项。
--- 执行记录：待生产核验。
+-- 执行记录：2026-11-27 本地测试通过，生产两张表和两个索引均已核验。
 
 CREATE TABLE IF NOT EXISTS activity_notice_inbox (
   source_url TEXT PRIMARY KEY NOT NULL,

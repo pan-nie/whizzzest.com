@@ -1,7 +1,7 @@
 -- 经逐篇核对的首批历史活动公告，仅保存事实摘要和原公告链接。
 -- npx wrangler d1 execute whizzzest --remote --file scripts/migrations/012-20261127-activity-notice-first-publication.sql
 -- 本地演练使用相同命令的 --local 选项。
--- 执行记录：待生产核验。
+-- 执行记录：2026-11-27 本地重跑测试通过，生产已核验六条历史公告及六条发布审核记录。
 -- 审核记录的 actor_uid=-1 保留给这次人工核对后的上线导入。
 -- 重复执行保留现有公告和后续编辑，若原文已手工录入则跳过。
 
