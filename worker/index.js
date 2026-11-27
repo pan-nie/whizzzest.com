@@ -18,7 +18,7 @@ import { handleLibrary } from './library.js';
 import { handleMusic, handleMusicPlay, handleMusicLatest } from './music.js';
 import { handleAttractions, handleAttractionsLatest } from './attractions.js';
 import { handleGallery, handleGalleryImage } from './gallery.js';
-import { handleActivityNotices } from './activity-notices.js';
+import { handleActivityNotices, handleHomeActivityNotices } from './activity-notices.js';
 import { collectActivityNotices, NOTICE_COLLECTION_CRON } from './activity-notice-collection.js';
 import { handleAiChat, handleAiConfig } from './ai.js';
 import { requireHttps } from '../shared/https.mjs';
@@ -59,6 +59,9 @@ export default {
     }
     if (url.pathname === '/api/music/latest' && request.method === 'GET') {
       return handleMusicLatest(env);
+    }
+    if (url.pathname === '/api/activity-notices/latest' && request.method === 'GET') {
+      return handleHomeActivityNotices(env, url);
     }
 
     // 平台内容计数（关于页「平台一览」数字条数据源，公开 JSON）

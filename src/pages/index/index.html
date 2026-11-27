@@ -4,12 +4,12 @@
 {{> head}}
 <body>
   {{> header}}
-  <main id="main">
+  <main id="main" class="home-page">
 
-    <section class="hero">
+    <section class="hero home-hero">
       <div class="hero-carousel" id="hero-carousel" aria-hidden="true">
         {{#each data.carousel as slide}}
-        <div class="hero-slide">
+        <div class="hero-slide{{#if_first}} active{{/if_first}}">
           <img {{#if_first}}src="/assets/img/{{slide.img}}" loading="eager" fetchpriority="high"{{/if_first}}{{#if_not_first}}data-src="/assets/img/{{slide.img}}"{{/if_not_first}} data-sizes="100vw" alt="{{slide.alt}}" decoding="async">
         </div>
         {{/each}}
@@ -29,65 +29,72 @@
       <div class="hero-content">
         <h1>{{data.hero.title}}</h1>
         <p class="hero-sub">{{data.hero.subtitle}}</p>
-        <p class="hero-cta"><a class="btn btn-light" href="{{data.hero.ctaHref}}">{{data.hero.cta}}</a></p>
+        <div class="hero-cta home-hero-actions">
+          <a class="btn btn-light" href="#activity-notices">{{data.hero.events}}</a>
+          <a class="btn home-hero-secondary" href="{{page.urlPrefix}}spots/">{{data.hero.spots}}</a>
+        </div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-head reveal">
-          <h2>{{data.featuresTitle}}</h2>
-        </div>
-        <div class="grid grid-3">
-          {{#each data.features as ftr}}
-          <div class="feature-card reveal">
-            <span class="feature-no">0{{@index}}</span>
-            <h3>{{ftr.title}}</h3>
-            <p>{{ftr.desc}}</p>
+    <div class="home-visit">
+      <div class="container-wide home-visit-grid">
+        <section class="home-visit-panel" id="activity-notices" aria-labelledby="activity-notices-heading" tabindex="-1">
+          <div class="home-visit-head">
+            <h2 id="activity-notices-heading">{{data.notices.title}}</h2>
+            <a href="{{page.urlPrefix}}news/">{{data.notices.all}} <span aria-hidden="true">→</span></a>
           </div>
-          {{/each}}
-        </div>
+          <div id="home-notices-content" aria-live="polite" data-unavailable="{{data.notices.unavailable}}">
+            <p class="home-notice-message">{{data.notices.intro}}</p>
+          </div>
+        </section>
+        <nav class="home-visit-panel" aria-labelledby="home-plan-heading">
+          <div class="home-visit-head">
+            <h2 id="home-plan-heading">{{data.plan.title}}</h2>
+          </div>
+          <ul class="home-plan-links">
+            {{#each data.plan.links as link}}
+            <li><a href="{{link.href}}">
+              <strong>{{link.title}}</strong>
+              <span>{{link.detail}}</span>
+              <span class="home-plan-arrow" aria-hidden="true">→</span>
+            </a></li>
+            {{/each}}
+          </ul>
+        </nav>
       </div>
-    </section>
+    </div>
 
-    <!-- 三主题压缩卡（原三段大图文改为一张卡网格，v2.7 首页改版） -->
-    <section class="section section-alt">
-      <div class="container">
-        <div class="section-head reveal">
+    <!-- 中文动态景点栏在主题介绍前展示，优先提供可直接打开的目的地。 -->
+    {{#if page.isDefaultLocale}}<section class="section home-strip" id="attract-strip" hidden>
+      <div class="container-wide">
+        <div class="home-strip-head reveal in">
+          <h2>{{data.plan.attractions}}</h2>
+          <a class="home-strip-more" href="/attractions/">{{t.home.attractMore}}</a>
+        </div>
+        <div class="home-strip-row" id="attract-strip-row"></div>
+      </div>
+    </section>{{/if}}
+
+    <section class="section home-explore">
+      <div class="container-wide">
+        <div class="home-section-head reveal">
           <h2>{{data.themes.title}}</h2>
-          <p>{{data.themes.desc}}</p>
         </div>
         <div class="grid grid-3">
           {{#each data.themes.items as t}}
           <a class="theme-card reveal" href="{{t.href}}">
             <div class="theme-media">
-              <img src="/assets/img/{{t.img}}" alt="{{t.title}}" loading="lazy" decoding="async" data-sizes="(max-width: 833px) 100vw, 380px">
+              <img src="/assets/img/{{t.img}}" alt="" loading="lazy" decoding="async" data-sizes="(max-width: 720px) 120px, 380px">
             </div>
             <div class="theme-body">
               <h3>{{t.title}}</h3>
               <p>{{t.desc}}</p>
-              <span class="theme-more">{{t.learnMore}} ›</span>
             </div>
           </a>
           {{/each}}
         </div>
       </div>
     </section>
-
-    <!-- 景点精选：JS 从 /api/attractions/latest 拉取填充；无 JS / 无数据时整块隐藏不占位。
-         数据来自 zh-only 的动态 API，非默认语言页不渲染（避免英文壳 + 中文内容）。 -->
-    {{#if page.isDefaultLocale}}<section class="section home-strip" id="attract-strip" hidden>
-      <div class="container-wide">
-        <div class="home-strip-head reveal in">
-          <div>
-            <span class="home-strip-kicker">{{t.home.attractKicker}}</span>
-            <h2>{{t.home.attractTitle}}</h2>
-          </div>
-          <a class="home-strip-more" href="/attractions/">{{t.home.attractMore}}</a>
-        </div>
-        <div class="home-strip-row" id="attract-strip-row"></div>
-      </div>
-    </section>{{/if}}
 
     <section class="section section-alt home-merchants">
       <div class="container">
@@ -153,14 +160,6 @@
           </a>
           {{/each}}
         </div>
-      </div>
-    </section>
-
-    <section class="cta-band">
-      <div class="reveal">
-        <h2>{{data.cta.title}}</h2>
-        <p>{{data.cta.desc}}</p>
-        <a class="btn" href="{{data.hero.ctaHref}}">{{data.cta.viewRoutes}}</a>
       </div>
     </section>
 

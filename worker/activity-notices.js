@@ -1,8 +1,9 @@
 import zh from '../src/data/news.json';
 import en from '../src/data/en/news.json';
-import { sessionEnd } from '../shared/activity-notices.mjs';
+import { localTime, sessionEnd } from '../shared/activity-notices.mjs';
 
 const PAGE_SIZE = 12;
+const HOME_LIMIT = 3;
 const GROUPS = [
   { key: 'upcoming', where: "public_until > ? AND public_state = 'scheduled'", order: 'public_start' },
   { key: 'changes', where: "public_until > ? AND public_state <> 'scheduled'", order: 'public_until' },
@@ -12,9 +13,9 @@ const GROUPS = [
 const esc = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;')
   .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-function renderTime(value) {
+function renderTime(value, label = value.replace('T', ' ')) {
   const datetime = value.length === 10 ? value : `${value}:00+08:00`;
-  return `<time datetime="${esc(datetime)}">${esc(value.replace('T', ' '))}</time>`;
+  return `<time datetime="${esc(datetime)}">${esc(label)}</time>`;
 }
 
 function renderSchedule(sessions, label) {
@@ -23,11 +24,14 @@ function renderSchedule(sessions, label) {
   return `${label ? `<p><strong>${label}</strong></p>` : ''}<ul class="notice-times">${items.join('')}</ul>`;
 }
 
+const isSuspended = (notice) => notice.state === 'postponed' || notice.state === 'cancelled';
+const activeSessions = (notice, now) => notice.sessions.filter((session) => sessionEnd(session) > now);
+
 function renderCard(row, archive, now, copy, lang) {
   const notice = JSON.parse(row.published);
   const rescheduled = notice.state === 'rescheduled';
-  const suspended = notice.state === 'postponed' || notice.state === 'cancelled';
-  const sessions = archive || suspended ? notice.sessions : notice.sessions.filter((item) => sessionEnd(item) > now);
+  const suspended = isSuspended(notice);
+  const sessions = archive || suspended ? notice.sessions : activeSessions(notice, now);
   return `<article class="feature-card notice-card" id="notice-${row.id}">
     <p class="notice-state">${copy[notice.state]}</p>
     <h3${lang}>${esc(notice.title)}</h3>
@@ -47,12 +51,17 @@ function pageNumber(raw) {
   return Number.isInteger(value) && value >= 1 && value <= 10000 ? value : 1;
 }
 
+function noticeQuery(db, { where, order }, now, limit, offset = 0) {
+  return db.prepare(`SELECT id, published FROM activity_notices
+    WHERE published IS NOT NULL AND ${where} ORDER BY ${order}, id LIMIT ? OFFSET ?`)
+    .bind(now, limit, offset);
+}
+
 async function renderBoard(db, url, copy, locale) {
   const now = Date.now();
   const pages = GROUPS.map(({ key }) => pageNumber(url.searchParams.get(key)));
-  const results = await db.batch(GROUPS.map(({ where, order }, index) => db.prepare(`SELECT id, published
-    FROM activity_notices WHERE published IS NOT NULL AND ${where} ORDER BY ${order}, id LIMIT ? OFFSET ?`)
-    .bind(now, PAGE_SIZE + 1, (pages[index] - 1) * PAGE_SIZE)));
+  const results = await db.batch(GROUPS.map((group, index) =>
+    noticeQuery(db, group, now, PAGE_SIZE + 1, (pages[index] - 1) * PAGE_SIZE)));
   const lang = locale === 'en' ? ' lang="zh-CN"' : '';
   return GROUPS.map(({ key }, index) => {
     const rows = results[index].results;
@@ -74,6 +83,60 @@ async function renderBoard(db, url, copy, locale) {
       ${prev || next ? `<nav class="notice-pagination" aria-label="${copy[key]}">${prev}${next}</nav>` : ''}
     </section>`;
   }).join('');
+}
+
+function homeRow(row, now, copy, lang, formatDate, href) {
+  const notice = JSON.parse(row.published);
+  const suspended = isSuspended(notice);
+  const session = activeSessions(notice, now)[0] || (suspended ? notice.sessions.at(-1) : null);
+  let dates = '';
+  let timing = '';
+  if (session) {
+    const { start, end } = session;
+    const spansDays = end && start.slice(0, 10) !== end.slice(0, 10);
+    dates = renderTime(start, formatDate(start));
+    if (spansDays) dates += `<span class="home-notice-date-range">– ${renderTime(end, formatDate(end))}</span>`;
+    const startTime = start.slice(11);
+    const endTime = end?.slice(11);
+    timing = startTime && endTime && !spansDays ? `${startTime}–${endTime}` : startTime;
+  }
+  const meta = [suspended ? copy.previousDates : '', esc(timing), `<span${lang}>${esc(notice.location)}</span>`]
+    .filter(Boolean).join(' · ');
+  const change = notice.state !== 'scheduled' ? ' home-notice-change' : '';
+  return `<li><a class="home-notice-row${change}" href="${href}#notice-${esc(row.id)}">
+    <span class="home-notice-date">${dates}</span>
+    <span><span class="home-notice-title"${lang}>${esc(notice.title)}</span><span class="home-notice-status">${copy[notice.state]}</span>
+      <span class="home-notice-meta">${meta}</span></span>
+  </a></li>`;
+}
+
+export async function handleHomeActivityNotices(env, url) {
+  const english = url.searchParams.get('lang') === 'en';
+  const copy = english ? en : zh;
+  const headers = { 'cache-control': 'no-store', 'content-type': 'text/html; charset=utf-8' };
+  try {
+    const now = Date.now();
+    const [upcoming, changes] = await env.DB.batch(GROUPS.slice(0, 2).map((group) =>
+      noticeQuery(env.DB, group, now, HOME_LIMIT)));
+    if (!changes.results.length && !upcoming.results.length) {
+      return new Response(`<p class="home-notice-message">${copy.upcomingEmpty}</p>`, { headers });
+    }
+
+    const lang = english ? ' lang="zh-CN"' : '';
+    const href = english ? '/en/news/' : '/news/';
+    const options = { timeZone: 'Asia/Shanghai', month: 'short', day: 'numeric' };
+    const locale = english ? 'en-US' : 'zh-CN';
+    const short = new Intl.DateTimeFormat(locale, options);
+    const full = new Intl.DateTimeFormat(locale, { ...options, year: 'numeric' });
+    const year = new Date(now + 8 * 3600000).getUTCFullYear();
+    const formatDate = (value) => (Number(value.slice(0, 4)) === year ? short : full).format(localTime(value));
+    const rows = [...changes.results, ...upcoming.results].slice(0, HOME_LIMIT);
+    const list = rows.map((row) => homeRow(row, now, copy, lang, formatDate, href)).join('');
+    return new Response(`<ul class="home-notice-list">${list}</ul>`, { headers });
+  } catch (err) {
+    console.error('homepage activity notices read failed', { error: String(err) });
+    return new Response(null, { status: 503, headers });
+  }
 }
 
 export async function handleActivityNotices(request, env, url, locale) {

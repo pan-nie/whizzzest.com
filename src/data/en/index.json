@@ -7,8 +7,8 @@
   "hero": {
     "title": "One encounter, ten thousand years endure",
     "subtitle": "Explore Wanzai’s fireworks, living traditions, local food and landscapes.",
-    "cta": "See tour routes",
-    "ctaHref": "/en/tourism/"
+    "events": "Upcoming events",
+    "spots": "Fireworks guide"
   },
   "carousel": [
     {
@@ -32,43 +32,39 @@
       "ar": "1080/721"
     }
   ],
-  "featuresTitle": "Highlights",
-  "features": [
-    {
-      "title": "Centuries of fireworks",
-      "desc": "Wanzai’s fireworks tradition reaches back to the Tang dynasty and continues in the county’s workshops and public displays."
-    },
-    {
-      "title": "Distinctive local flavors",
-      "desc": "Try the Six Bowls of Wanzai, edible lily bulbs and Luocheng rice noodles, specialties of western Jiangxi."
-    },
-    {
-      "title": "From the old town to the forest",
-      "desc": "Walk the lanes of Wanzai Ancient City, visit Zhushan Cave or head to Jiulong Forest Park."
-    }
-  ],
+  "notices": {
+    "title": "Wanzai event notices",
+    "all": "All notices",
+    "intro": "Check verified events and schedule changes.",
+    "unavailable": "Upcoming events are temporarily unavailable."
+  },
+  "plan": {
+    "title": "Plan your visit",
+    "links": [
+      { "title": "Fireworks spots", "detail": "Ancient City · Longhu Park", "href": "/en/spots/" },
+      { "title": "Attractions", "detail": "Ancient City · Zhushan Cave", "href": "/en/attractions/" },
+      { "title": "Tour routes", "detail": "Old town · Nature · History", "href": "/en/tourism/" },
+      { "title": "Eat & stay", "detail": "Restaurants · Lodging · Gifts", "href": "/en/merchants/" }
+    ]
+  },
   "themes": {
     "title": "Discover Wanzai",
-    "desc": "Start with Wanzai’s traditional arts, local cooking or the workshops behind its fireworks displays.",
     "items": [
       {
         "title": "Living heritage",
         "desc": "Explore Wanzai’s fireworks craft, Desheng Drum music, Kaikou Nuo ritual theater and Xiabu ramie weaving.",
-        "learnMore": "Learn more",
         "href": "/en/heritage/",
         "img": "nuowu.jpeg"
       },
       {
         "title": "Local flavors",
         "desc": "Discover Wanzai’s banquet dishes, Luocheng rice noodles and edible lily products.",
-        "learnMore": "Learn more",
         "href": "/en/cuisine/",
         "img": "liudawan.jpeg"
       },
       {
         "title": "Fireworks industry",
         "desc": "See how a craft once practiced in family workshops grew into a major local industry.",
-        "learnMore": "Learn more",
         "href": "/en/industry/",
         "img": "longhu_yanhuowanhui.jpeg"
       }
@@ -95,11 +91,6 @@
         "href": "/en/library/"
       }
     ]
-  },
-  "cta": {
-    "title": "Start your Wanzai journey",
-    "desc": "Find an itinerary for the old town, nearby landscapes or Wanzai’s revolutionary history.",
-    "viewRoutes": "See tour routes"
   },
   "merchants": {
     "title": "Whizzzest Picks",

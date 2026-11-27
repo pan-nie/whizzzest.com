@@ -648,13 +648,6 @@ button {
   background: var(--c-bg);
 }
 
-.feature-card .feature-no {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--c-accent);
-  letter-spacing: 0.06em;
-}
-
 .feature-card h3 {
   margin-top: 10px;
   font-size: 28px;
@@ -1377,6 +1370,224 @@ a.feature-card:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .js .hero-slide { transition: none; }
+}
+
+/* ---------------- 首页首屏与出游入口 ---------------- */
+
+.home-hero {
+  min-height: clamp(440px, 54svh, 520px);
+  background: #211216;
+  text-align: left;
+}
+
+.home-hero .hero-overlay {
+  background: linear-gradient(90deg, rgba(18, 10, 15, 0.83), rgba(18, 10, 15, 0.48) 52%, transparent),
+    linear-gradient(0deg, rgba(18, 10, 15, 0.54), transparent 60%);
+}
+
+.home-hero .hero-content {
+  max-width: 1200px;
+  padding: 48px 22px 64px;
+}
+
+.home-hero h1 {
+  max-width: 16ch;
+  font-size: clamp(44px, 5vw, 68px);
+  text-wrap: balance;
+}
+
+.home-hero .hero-sub {
+  max-width: 36em;
+  font-size: clamp(16px, 1.55vw, 20px);
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.home-hero .home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.home-hero-actions .btn {
+  padding: 12px 19px;
+  font-size: 15px;
+}
+
+.home-hero-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(23, 12, 16, 0.36);
+}
+
+.home-hero-secondary:hover {
+  background: rgba(23, 12, 16, 0.72);
+}
+
+.home-hero .hero-arrow {
+  top: auto;
+  bottom: 14px;
+  transform: none;
+}
+
+.home-hero:not(.has-carousel) :is(.hero-arrow, .hero-dots) {
+  display: none;
+}
+
+.home-visit {
+  padding: 26px 0 30px;
+  background: #faf6f1;
+  border-bottom: 1px solid #ede4dd;
+}
+
+.home-visit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.home-visit-panel {
+  --home-line: #ede4dd;
+  --home-ink: #715c52;
+  padding: 19px 21px 20px;
+  border: 1px solid var(--home-line);
+  border-radius: 16px;
+  background: #fff;
+  scroll-margin-top: calc(var(--nav-h) + 12px);
+}
+
+.home-visit-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.home-visit-head h2,
+.home-section-head h2 {
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.home-visit-head h2 { font-size: clamp(21px, 2.1vw, 28px); }
+.home-visit-head a { color: var(--c-accent-dark); font-size: 14px; font-weight: 600; }
+.home-visit-head a:hover { text-decoration: underline; }
+
+.home-notice-message {
+  padding-top: 13px;
+  border-top: 1px solid var(--home-line);
+  color: var(--home-ink);
+  font-size: 15px;
+}
+
+.home-notice-row {
+  display: grid;
+  grid-template-columns: clamp(67px, 8vw, 92px) minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--home-line);
+}
+
+.home-notice-list li:last-child .home-notice-row { padding-bottom: 0; }
+
+.home-notice-date {
+  align-self: center;
+  padding: 5px 4px;
+  border-radius: 6px;
+  background: #f7f1ec;
+  color: #67493a;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-notice-date time { display: block; white-space: nowrap; }
+.home-notice-date-range { display: block; }
+.home-notice-date-range time { display: inline; }
+.home-notice-title { font-weight: 650; font-size: 15px; overflow-wrap: anywhere; }
+.home-notice-row:hover .home-notice-title { text-decoration: underline; }
+.home-notice-meta { display: block; margin-top: 2px; color: var(--home-ink); font-size: 13px; overflow-wrap: anywhere; }
+
+.home-notice-status {
+  display: inline-block;
+  vertical-align: 0.08em;
+  margin-inline-start: 7px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #eef3ef;
+  color: #315744;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.home-notice-change .home-notice-status { background: #faeee7; color: #96371e; }
+
+.home-plan-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.home-plan-links a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  min-height: 58px;
+  padding: 8px 27px 8px 11px;
+  border: 1px solid var(--home-line);
+  border-radius: 8px;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.home-plan-links a:hover { background: #faf6f1; }
+.home-plan-links strong { font-weight: 650; }
+.home-plan-links span { margin-top: 3px; color: var(--home-ink); font-size: 12px; }
+.home-plan-links .home-plan-arrow { position: absolute; inset: 8px 10px auto auto; margin: 0; color: var(--c-accent-dark); font-size: 15px; }
+
+.home-page .section { padding-block: clamp(36px, 5vw, 72px); }
+.home-page :is(#attract-strip, .home-explore) { padding-block: clamp(28px, 4vw, 54px); }
+.home-page .section-head { margin-bottom: clamp(24px, 4vw, 38px); }
+.home-section-head { margin-bottom: 20px; }
+.home-section-head h2 { font-size: clamp(28px, 3.25vw, 40px); }
+.home-explore .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-explore .theme-media { aspect-ratio: 16 / 8; }
+.home-explore .theme-body { padding: 16px 19px 19px; }
+
+@media (max-width: 760px) {
+  .home-hero { min-height: clamp(300px, 41svh, 360px); }
+  .home-hero .hero-content { padding-block: 32px 51px; }
+  .home-hero .hero-overlay {
+    background: linear-gradient(90deg, rgba(18, 10, 15, 0.75), rgba(18, 10, 15, 0.38)),
+      linear-gradient(0deg, rgba(18, 10, 15, 0.52), transparent 55%);
+  }
+  .home-hero h1 { font-size: clamp(27px, 8.7vw, 45px); }
+  .home-hero .hero-sub { margin-top: 12px; }
+  .home-hero .home-hero-actions { margin-top: 18px; }
+  .home-hero .hero-arrow { display: none; }
+  .home-hero .hero-dots { bottom: 8px; }
+  .home-visit { padding-block: 15px 20px; }
+  .home-visit-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; padding-inline: 16px; }
+  .home-visit-panel { padding: 14px 15px 15px; border-radius: 12px; }
+  .home-visit-head { margin-bottom: 9px; }
+  .home-visit-head a { font-size: 13px; }
+  .home-notice-message { padding-top: 9px; }
+  .home-notice-row { grid-template-columns: 79px minmax(0, 1fr); }
+  .home-notice-date { font-size: 12px; }
+  .home-explore .grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .home-explore .theme-card { display: grid; grid-template-columns: minmax(88px, 28%) minmax(0, 1fr); border-radius: 12px; }
+  .home-explore .theme-media { aspect-ratio: auto; }
+  .home-explore .theme-body { padding: 12px; }
+  .home-explore .theme-body h3 { font-size: 17px; }
+  .home-explore .theme-body p { margin-top: 4px; font-size: 13px; }
 }
 
 /* ---------------- 内页图 Hero ---------------- */
@@ -3190,14 +3401,6 @@ body:has(.lightbox[open]) {
   font-size: 15px;
   color: var(--c-text-2);
   line-height: 1.55;
-}
-
-.theme-more {
-  display: inline-block;
-  margin-top: 14px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--c-accent);
 }
 
 /* 景点精选条卡片（白底条） */

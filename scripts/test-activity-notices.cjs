@@ -69,6 +69,10 @@ async function page(pathname = '/news/', worker = site) {
   return response.text();
 }
 
+async function homeNotices(worker = site, locale = 'zh') {
+  return page(`/api/activity-notices/latest?lang=${locale}`, worker);
+}
+
 const section = (html, name) => html.match(new RegExp(`<section class="notice-section" id="${name}">([\\s\\S]*?)</section>`))[1];
 
 before(async () => {
@@ -157,11 +161,16 @@ test('active multi-session notice hides elapsed slots and a reviewed reschedule 
   const item = PATH + '/' + id;
   const initial = { ...samples[0], id, title: '本地验证：两场演出 <试编>', sessions: [{ start: day(-2) }, { start: day(2) }] };
   assert.equal((await adminRequest(PATH, initial)).status, 201);
+  assert.doesNotMatch(await homeNotices(), /本地验证：两场演出/);
   assert.equal((await adminRequest(item + '/publish', { revision: 1 })).status, 200);
   const active = section(await page(), 'upcoming');
   assert.match(active, /本地验证：两场演出 &lt;试编&gt;/);
   assert.ok(active.includes(day(2)));
   assert.ok(!active.includes(day(-2)));
+  const home = await homeNotices();
+  assert.match(home, /本地验证：两场演出 &lt;试编&gt;/);
+  assert.ok(home.includes(`datetime="${day(2)}"`));
+  assert.ok(!home.includes(`datetime="${day(-2)}"`));
 
   const sessions = [{ start: day(4) }];
   assert.equal((await adminRequest(item, { ...initial, sessions, revision: 2 })).status, 400);
@@ -204,6 +213,8 @@ test('a notice moves from upcoming to archive exactly at the published end time'
   assert.ok(!section(before, 'archive').includes(title));
   assert.ok(!section(after, 'upcoming').includes(title));
   assert.ok(section(after, 'archive').includes(title));
+  assert.ok((await homeNotices(justBeforeExpiry)).includes(title));
+  assert.ok(!(await homeNotices(atExpiry)).includes(title));
 });
 
 test('daily collection deduplicates sources and keeps changes pending until an editor publishes', async () => {
@@ -261,6 +272,30 @@ test('initial publication is idempotent and all six official notices are histori
   assert.equal((section(html, 'archive').match(/class="feature-card notice-card"/g) || []).length, 6);
   assert.equal((section(html, 'archive').match(/href="https:\/\/www\.wanzai\.gov\.cn\/wzxrmzf\//g) || []).length, 6);
   assert.doesNotMatch(section(html, 'upcoming'), /notice-card/);
+  assert.match(await homeNotices(seedSite), /暂无已核实的近期活动/);
   const audit = await seedDb.prepare("SELECT count(*) AS total FROM activity_notice_history WHERE action = 'publish' AND actor_uid = -1").first();
   assert.equal(audit.total, 6);
+});
+
+test('homepage caps the list, puts active changes first and links to the localized notice board', async () => {
+  const id = randomUUID();
+  const insert = seedDb.prepare(`INSERT INTO activity_notices (id,draft,published,public_state,public_start,public_until)
+    VALUES (?1,?2,?2,?3,?4,?5)`);
+  const { noticeWindow } = await import('../shared/activity-notices.mjs');
+  const notices = [
+    { id, title: '闭馆提醒', state: 'cancelled', sessions: [{ start: '2026-12-04' }], visible_through: '2026-12-10' },
+    ...[6, 7, 8, 9].map((day) => ({ id: randomUUID(), title: `场次 ${day}`, state: 'scheduled',
+      sessions: [{ start: `2026-12-0${day}T20:00` }] })),
+  ];
+  await seedDb.batch(notices.map((notice) => {
+    const { start, until } = noticeWindow(notice);
+    return insert.bind(notice.id, JSON.stringify({ ...samples[0], ...notice }), notice.state, start, until);
+  }));
+  const summary = await homeNotices(seedSite);
+  assert.equal((summary.match(/class="home-notice-row/g) || []).length, 3);
+  assert.match(summary, /闭馆提醒[\s\S]+已取消[\s\S]+原定时间[\s\S]+场次 6[\s\S]+场次 7/);
+  assert.doesNotMatch(summary, /场次 [89]/);
+  const english = await homeNotices(seedSite, 'en');
+  assert.ok(english.includes(`/en/news/#notice-${id}`));
+  assert.match(english, /lang="zh-CN">闭馆提醒[\s\S]+Cancelled/);
 });
