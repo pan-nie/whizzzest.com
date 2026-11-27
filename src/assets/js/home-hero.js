@@ -1,5 +1,5 @@
 /**
- * home-hero.js — 首页专属交互（Hero 轮播 + 三条媒体拉取：焰境影像/景点精选/焰境仙曲）
+ * home-hero.js — 首页轮播、实时公告与内容条
  * 2026-09-10 结构精简 A3 自 main.js 拆出：仅首页（src/pages/index）加载，其余页面不再下载这部分。
  * 原生 ES Module，无依赖。
  */
@@ -8,9 +8,9 @@
 /* reduced-motion：与 main.js 滚动浮现同款判定（拆分后各自持有） */
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* 首页 Hero 轮播（交叉淡入；无 JS / reduced-motion 时静止第一张） */
+/* 减少动态效果时仅提供手动切换。首张图片随 HTML 显示。 */
 const carousel = document.getElementById('hero-carousel');
-if (carousel && !reduceMotion) {
+if (carousel) {
   const slides = [...carousel.querySelectorAll('.hero-slide')];
   const dots = [...document.querySelectorAll('.hero-dot')];
   let current = 0;
@@ -30,13 +30,13 @@ if (carousel && !reduceMotion) {
     current = (i + slides.length) % slides.length;
     activate(current);
     // 稍候预取下一张，不与当前张抢带宽
-    setTimeout(() => activate(current + 1), 1500);
+    if (!reduceMotion) setTimeout(() => activate(current + 1), 1500);
     slides.forEach((s, k) => s.classList.toggle('active', k === current));
     dots.forEach((d, k) => d.classList.toggle('active', k === current));
   };
 
   const play = () => {
-    if (slides.length < 2) return;
+    if (reduceMotion || slides.length < 2) return;
     stop();
     timer = setInterval(() => show(current + 1), 5000);
   };
@@ -45,15 +45,35 @@ if (carousel && !reduceMotion) {
   document.querySelector('.hero-arrow-prev')?.addEventListener('click', () => (show(current - 1), play()));
   document.querySelector('.hero-arrow-next')?.addEventListener('click', () => (show(current + 1), play()));
   dots.forEach((d, k) => d.addEventListener('click', () => (show(k), play())));
-  carousel.closest('.hero')?.addEventListener('mouseenter', stop);
-  carousel.closest('.hero')?.addEventListener('mouseleave', play);
+  const hero = carousel.closest('.hero');
+  hero?.addEventListener('mouseenter', stop);
+  hero?.addEventListener('mouseleave', play);
+  hero?.classList.toggle('has-carousel', slides.length > 1);
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : play()));
 
   show(0);
   play();
-} else {
-  // 无轮播逻辑时保证第一张可见（.hero-slide:not(:first-child) 已隐藏其余）
-  carousel?.querySelector('.hero-slide')?.classList.add('active');
+}
+
+const notices = document.getElementById('home-notices-content');
+if (notices) {
+  const locale = document.documentElement.lang === 'en' ? 'en' : 'zh';
+  const loadNotices = async () => {
+    try {
+      const response = await fetch(`/api/activity-notices/latest?lang=${locale}`, {
+        signal: AbortSignal.timeout?.(5000),
+      });
+      if (!response.ok) throw new Error('Activity notices unavailable');
+      notices.innerHTML = await response.text();
+    } catch {
+      const message = document.createElement('p');
+      message.className = 'home-notice-message';
+      message.textContent = notices.dataset.unavailable;
+      notices.replaceChildren(message);
+    }
+  };
+  loadNotices();
+  window.addEventListener('pageshow', (event) => { if (event.persisted) loadNotices(); });
 }
 
 /* 首页媒体条（焰境影像 / 景点精选 / 焰境仙曲）共用工具与拉取：

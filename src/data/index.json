@@ -2,14 +2,14 @@
   "hero": {
     "title": "一朝相逢，便是万载",
     "subtitle": "探索千年烟花文化，体验非遗魅力，品味特色美食，领略万载风光",
-    "cta": "查看旅游线路",
-    "ctaHref": "/tourism/"
+    "events": "查看近期活动",
+    "spots": "赏烟攻略"
   },
   "carousel": [
     {
-      "img": "yzxf_bswz.jpeg",
-      "alt": "一朝相逢，便是万载",
-      "ar": "1600/1116"
+      "img": "guchen_yanhua.jpeg",
+      "alt": "万载古城上空的焰火",
+      "ar": "1600/1142"
     },
     {
       "img": "guchen_xuejing.jpg",
@@ -27,43 +27,40 @@
       "ar": "1080/721"
     }
   ],
-  "featuresTitle": "核心特色",
-  "features": [
-    {
-      "title": "千年烟花文化",
-      "desc": "万载拥有1400多年的烟花生产历史，乃\"中国花炮之乡\"。"
-    },
-    {
-      "title": "特色美食特产",
-      "desc": "品尝万载六大碗、万载百合、罗城扎粉等特色美食，感受赣西独特的饮食文化。"
-    },
-    {
-      "title": "丰富旅游资源",
-      "desc": "万载古城、竹山洞、九龙原始森林等众多景点，满足不同游客的旅游需求。"
-    }
-  ],
+  "notices": {
+    "title": "万载活动公告",
+    "all": "查看全部公告",
+    "intro": "查阅已核实的近期活动和场次变更。",
+    "unavailable": "暂时无法加载近期活动。"
+  },
+  "plan": {
+    "title": "计划行程",
+    "attractions": "景点精选",
+    "links": [
+      { "title": "赏烟地点", "detail": "古城 · 龙湖公园", "href": "/spots/" },
+      { "title": "旅游景点", "detail": "万载古城 · 竹山洞", "href": "/attractions/" },
+      { "title": "旅游线路", "detail": "古城 · 山水 · 红色文化", "href": "/tourism/" },
+      { "title": "吃住好店", "detail": "餐馆 · 民宿 · 特产", "href": "/merchants/" }
+    ]
+  },
   "themes": {
     "title": "走进万载",
-    "desc": "千年花炮、赣西风味、山水古城——从这三扇门开始认识万载。",
     "items": [
       {
         "title": "非遗文化",
         "desc": "花炮、得胜鼓、开口傩、夏布织造，千年非遗活在这座城的烟火里。",
-        "learnMore": "了解更多",
         "href": "/heritage/",
         "img": "nuowu.jpeg"
       },
       {
         "title": "美食特产",
         "desc": "六大碗、罗城扎粉、百合粉，舌尖上的万载。",
-        "learnMore": "了解更多",
         "href": "/cuisine/",
         "img": "liudawan.jpeg"
       },
       {
         "title": "烟花产业",
         "desc": "中国四大花炮主产区之一，从手工作坊到点亮全球夜空。",
-        "learnMore": "了解更多",
         "href": "/industry/",
         "img": "longhu_yanhuowanhui.jpeg"
       }
@@ -90,11 +87,6 @@
         "href": "/library/"
       }
     ]
-  },
-  "cta": {
-    "title": "开始您的万载之旅",
-    "desc": "无论您是想体验千年烟花文化，还是品尝特色美食，或是欣赏自然风光，万载都能满足您的需求。",
-    "viewRoutes": "查看旅游线路"
   },
   "merchants": {
     "title": "焰境好店",

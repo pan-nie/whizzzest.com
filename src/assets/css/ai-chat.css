@@ -502,6 +502,16 @@ body.music-body .hn-fab { bottom: 92px; }
 @media (max-width: 640px) {
   .hn-fab { left: 16px; bottom: 16px; }
   body.music-body .hn-fab { bottom: 80px; }
+  .home-page ~ .hn-fab {
+    top: calc((var(--nav-h) - 38px) / 2);
+    right: 68px;
+    bottom: auto;
+    left: auto;
+    z-index: 101;
+    width: 38px;
+    height: 38px;
+  }
+  .home-page ~ .hn-fab .hn-nuo { --s: 31; }
   .hn-panel {
     left: 0;
     bottom: 0;
