@@ -19,6 +19,7 @@ import { handleMusic, handleMusicPlay, handleMusicLatest } from './music.js';
 import { handleAttractions, handleAttractionsLatest } from './attractions.js';
 import { handleGallery, handleGalleryImage } from './gallery.js';
 import { handleActivityNotices } from './activity-notices.js';
+import { collectActivityNotices, NOTICE_COLLECTION_CRON } from './activity-notice-collection.js';
 import { handleAiChat, handleAiConfig } from './ai.js';
 import { requireHttps } from '../shared/https.mjs';
 
@@ -143,6 +144,10 @@ export default {
   // 每日定时清理（docs/访客治理方案.md 阶段二 W3）：明细保留 90 天
   // cron 20:17 UTC = 北京 04:17 低峰；删除量 ≈ 每日写入量（数千行），计入 rows written 配额
   async scheduled(event, env, ctx) {
+    if (event.cron === NOTICE_COLLECTION_CRON) {
+      await collectActivityNotices(env);
+      return;
+    }
     try {
       const cutoff = new Date(Date.now() + 8 * 60 * 60 * 1000 - 90 * 24 * 60 * 60 * 1000)
         .toISOString().slice(0, 10);

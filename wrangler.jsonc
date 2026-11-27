@@ -8,7 +8,8 @@
   // 可观测日志（对齐 admin/writer/merchant 三个子站；docs/全站优化方案.md W4）
   "observability": { "enabled": true },
   // 每日访客数据清理（docs/访客治理方案.md 阶段二 W3）：明细保留 90 天，北京 04:17 低峰执行
-  "triggers": { "crons": ["17 20 * * *"] },
+  // 万载活动公告每天 08:00（北京时间）更新待审稿。
+  "triggers": { "crons": ["17 20 * * *", "0 0 * * *"] },
   "main": "worker/index.js",
   "assets": {
     "directory": "./dist",

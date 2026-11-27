@@ -2435,6 +2435,7 @@ ${BASE_CSS}
   .mgrid textarea { resize: vertical; line-height: 1.7; }
   #view-notices [hidden] { display: none; }
   #view-notices .ops { flex-wrap: wrap; align-items: center; }
+  #notice-inbox select { max-width: 100%; min-width: 0; }
   #view-notices .mgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #view-notices .mgrid :is(input, select, textarea) { min-width: 0; width: 100%; }
   .mst { padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }

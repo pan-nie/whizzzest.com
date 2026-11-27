@@ -2,6 +2,11 @@ export const NOTICES_PANEL = `
 <div id="view-notices" class="wrap" style="display:none">
   <div class="range"><h2>万载活动公告</h2><button id="notice-add" type="button" class="primary">新建公告</button></div>
   <p id="notice-feedback" class="vhint" role="status"></p>
+  <section class="panel" aria-labelledby="notice-inbox-title">
+    <h3 id="notice-inbox-title">采集待审</h3>
+    <p id="notice-inbox-status" class="vhint" role="status"></p>
+    <div id="notice-inbox"></div>
+  </section>
   <form id="notice-form" class="panel" hidden>
     <h3 id="notice-form-title">新建公告</h3>
     <div class="mgrid">
@@ -44,6 +49,7 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
   const path = '/api/activity-notices';
   const form = el('notice-form');
   const list = el('notice-list');
+  const inbox = el('notice-inbox');
   const dialog = el('notice-review');
   const publish = el('notice-publish');
   const feedback = el('notice-feedback');
@@ -54,9 +60,11 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
     incomplete: '请补齐摘要、地点、来源、刊载和核验日期、场次及所需的变更信息，再审核发布。',
     schedule_change: '已发布公告的场次有变。请选择改期、延期或取消，并附对应来源。',
     conflict: '这条公告已更新。请刷新列表后，按最新版本继续。',
+    candidate_changed: '这条采集稿或来源链接已变更。请刷新采集待审，再打开原文。',
     invalid_transition: '这条公告已下线，请刷新列表。',
   };
   let editing;
+  let attachedCandidate;
   let pendingId;
   let reviewing;
   let page = 1;
@@ -90,6 +98,7 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
 
   function edit(row, rescheduling = false) {
     if (busy) return;
+    attachedCandidate = undefined;
     editing = row;
     pendingId = row?.id || crypto.randomUUID();
     form.reset();
@@ -138,6 +147,75 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
     item.textContent = label;
     item.addEventListener('click', action);
     return item;
+  }
+
+  async function openCandidate(candidate, id) {
+    if (busy) return;
+    try {
+      const row = id ? (await api(path + '/' + id)).row : undefined;
+      if (busy) return;
+      edit(row);
+      attachedCandidate = candidate;
+      if (!row) form.elements.title.value = candidate.source_title.slice(0, 120);
+      for (const key of ['source_url', 'source_title', 'source_name', 'source_date']) {
+        form.elements.namedItem(key).value = candidate[key];
+      }
+      form.elements.verified_on.value = '';
+      feedback.textContent = '请核对原公告，补全事实摘要、场次和核验日期，再提交审核。';
+    } catch (error) {
+      feedback.textContent = errorText(error);
+    }
+  }
+
+  async function loadInbox(currentNotices, sequence) {
+    const statusLine = el('notice-inbox-status');
+    try {
+      const { rows, run } = await api(path + '/inbox');
+      if (sequence !== loading) return;
+      const status = { ok: '成功', partial: '部分来源失败', failed: '失败' };
+      const when = run ? new Date(run.checked_at).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '';
+      statusLine.textContent = run ? '最近采集（北京时间）' + when + ' · ' + status[run.status] +
+        ' · 收录或更新 ' + run.changed + ' 条 · 失败 ' + run.failed + ' 项' : '等待首次采集（每日 08:00，北京时间）。';
+      inbox.replaceChildren();
+      if (!rows.length) inbox.textContent = '暂无采集稿待处理。';
+      for (const candidate of rows) {
+        const card = document.createElement('article');
+        card.className = 'msg read';
+        const link = document.createElement('a');
+        link.href = candidate.source_url;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = candidate.source_title;
+        const info = document.createElement('p');
+        info.className = 'time';
+        info.textContent = (candidate.is_change ? '原文变更或变更公告' : '新公告') + ' · ' + candidate.source_name + ' · ' + candidate.source_date;
+        const ops = document.createElement('div');
+        ops.className = 'ops';
+        const target = document.createElement('select');
+        target.setAttribute('aria-label', '选择要更新的公告');
+        if (candidate.notice_id) {
+          const row = currentNotices.find((entry) => entry.id === candidate.notice_id);
+          target.append(new Option(row?.draft.title || '更新已关联公告', candidate.notice_id));
+        } else {
+          target.append(new Option('新建公告草稿', ''));
+          for (const row of currentNotices) target.append(new Option(row.draft.title, row.id));
+        }
+        ops.append(target, button('填写草稿', () => openCandidate(candidate, target.value)), button('忽略此稿', async () => {
+          if (busy) return;
+          busy = true;
+          try {
+            await post(path + '/inbox/dismiss', candidate);
+            await load();
+          } catch (error) {
+            feedback.textContent = errorText(error);
+          } finally { busy = false; }
+        }));
+        card.append(link, info, ops);
+        inbox.append(card);
+      }
+    } catch (error) {
+      if (sequence === loading) statusLine.textContent = '采集待审暂时无法加载。';
+    }
   }
 
   async function act(row, action) {
@@ -193,6 +271,7 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
       if (!result.rows.length) list.textContent = '暂无公告。';
       el('notice-prev').hidden = page <= 1;
       el('notice-next').hidden = !result.more;
+      await loadInbox(result.rows, sequence);
     } catch (error) {
       if (sequence === loading) feedback.textContent = errorText(error);
     }
@@ -200,7 +279,7 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
 
   form.elements.state.addEventListener('change', updateFields);
   el('notice-add').addEventListener('click', () => edit());
-  el('notice-cancel').addEventListener('click', () => { form.hidden = true; el('notice-add').focus(); });
+  el('notice-cancel').addEventListener('click', () => { attachedCandidate = undefined; form.hidden = true; el('notice-add').focus(); });
   el('notice-prev').addEventListener('click', () => load(page - 1));
   el('notice-next').addEventListener('click', () => load(page + 1));
   publish.addEventListener('click', () => act(reviewing, 'publish'));
@@ -214,7 +293,9 @@ export const NOTICES_INIT = String.raw`(function initNotices(api, el) {
       draft.sessions = readSchedule(draft.sessions);
       draft.previous_sessions = draft.state === 'rescheduled' ? readSchedule(draft.previous_sessions) : [];
       if (draft.state === 'scheduled') draft.change_note = '';
-      await post(editing ? path + '/' + editing.id : path, { ...draft, id: pendingId, revision: editing?.revision });
+      await post(editing ? path + '/' + editing.id : path, {
+        ...draft, id: pendingId, revision: editing?.revision, candidate_fingerprint: attachedCandidate?.fingerprint,
+      });
       form.hidden = true;
       await load(1);
       feedback.textContent = '草稿已保存，可以审核发布。';
